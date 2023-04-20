@@ -73,3 +73,41 @@ echo "deb [signed-by=/usr/share/keyrings/docker.gpg arch=amd64] https://download
 sudo apt update
 sudo apt install containerd.io -y
 ```
+
+### Configure containerd
+
+```bash
+sudo mkdir -p /etc/containerd
+sudo containerd config default | sudo tee /etc/containerd/config.toml
+sudo systemctl restart containerd
+sudo systemctl enable containerd
+```
+
+## Kubeadm install
+
+```bash
+sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | \
+sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt update
+export K8S_VERSION="1.27.1-00"
+sudo apt install -y \
+    kubeadm="${K8S_VERSION}" \
+    kubelet="${K8S_VERSION}" \
+    kubectl="${K8S_VERSION}"
+sudo apt-mark hold kubelet kubeadm kubectl
+kubeadm completion bash | sudo tee /etc/bash_completion.d/kubeadm &>/dev/null
+kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl &>/dev/null
+sudo systemctl enable --now kubelet
+```
+
+### Helm
+
+```bash
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+rm get_helm.sh
+helm completion bash | sudo tee /etc/bash_completion.d/helm &>/dev/null
+
+```
