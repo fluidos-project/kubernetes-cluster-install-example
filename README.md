@@ -202,11 +202,10 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```bash
 export CALICO_VERSION=3.25.0
 curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/tigera-operator.yaml -O
-
+kubectl create -f tigera-operator.yaml
 curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/custom-resources.yaml -O
 sed -i 's#cidr: 192.168.0.0/16#cidr: 10.244.0.0/16#' custom-resources.yaml
-
-kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+kubectl create -f custom-resources.yaml
 ```
 
 ### Taint the master node allow workload
