@@ -119,6 +119,8 @@ sudo apt install -y \
 sudo apt-mark hold kubelet kubeadm kubectl
 kubeadm completion bash | sudo tee /etc/bash_completion.d/kubeadm &>/dev/null
 kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl &>/dev/null
+source <(kubeadm completion bash)
+source <(kubectl completion bash)
 sudo systemctl enable --now kubelet
 ```
 
