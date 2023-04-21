@@ -66,6 +66,10 @@ sudo ufw allow 2379:2380/tcp
 sudo ufw allow 10250/tcp
 sudo ufw allow 10259/tcp
 sudo ufw allow 10257/tcp
+sudo ufw allow 179/tcp
+sudo ufw allow 4789/udp
+sudo ufw allow 4789/tcp
+sudo ufw allow 2379/tcp
 sudo ufw enable
 sudo ufw status
 ```
@@ -74,6 +78,10 @@ sudo ufw status
 sudo ufw allow "OpenSSH"
 sudo ufw allow 10250/tcp
 sudo ufw allow 30000:32767/tcp
+sudo ufw allow 179/tcp
+sudo ufw allow 4789/udp
+sudo ufw allow 4789/tcp
+sudo ufw allow 2379/tcp
 sudo ufw enable
 sudo ufw status
 ```
@@ -193,7 +201,8 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ### Install calico CNI
 ```bash
 export CALICO_VERSION=3.25.0
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/tigera-operator.yaml
+curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/tigera-operator.yaml -O
+
 curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/custom-resources.yaml -O
 sed -i 's#cidr: 192.168.0.0/16#cidr: 10.244.0.0/16#' custom-resources.yaml
 
@@ -209,4 +218,14 @@ kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 ```bash
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 helm install --set 'args={--kubelet-insecure-tls}' --namespace kube-system metrics metrics-server/metrics-server
+```
+
+#### liqo
+```bash
+curl --fail -LS "https://github.com/liqotech/liqo/releases/download/v0.7.2/liqoctl-linux-amd64.tar.gz" | tar -xz
+sudo install -o root -g root -m 0755 liqoctl /usr/local/bin/liqoctl
+liqoctl completion bash | sudo tee /etc/bash_completion.d/liqoctl &>/dev/null
+source <(liqoctl completion bash)
+rm liqoctl
+rm LICENSE
 ```
