@@ -113,7 +113,7 @@ sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packag
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | \
 sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt update
-export K8S_VERSION="1.27.1-00"
+export K8S_VERSION="1.26.3-00"
 sudo apt install -y \
     kubeadm="${K8S_VERSION}" \
     kubelet="${K8S_VERSION}" \
