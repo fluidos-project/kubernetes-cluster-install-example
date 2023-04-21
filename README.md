@@ -170,4 +170,43 @@ kube-vip manifest pod \
     --leaderElection | sudo tee /etc/kubernetes/manifests/kube-vip.yaml
 ```
 
+### Kubeadm init node
+
+on node rob-node-00
+
+```bash
+sudo kubeadm init \
+--pod-network-cidr=10.244.0.0/16 \
+--apiserver-advertise-address=192.168.2.100 \
+--control-plane-endpoint 192.168.2.10:6443 \
+--cri-socket unix:///var/run/containerd/containerd.sock \
+--upload-certs \
+--apiserver-cert-extra-sans=127.0.0.1,rob-node-00,192.168.2.100,rob-node-01,192.168.2.101,rob-node-02,192.168.2.102
+```
+### Create cluster configuration for kubectl
+```bash
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+### Install calico CNI
+```bash
+export CALICO_VERSION=3.25.0
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/tigera-operator.yaml
+curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/custom-resources.yaml -O
+sed -i 's#cidr: 192.168.0.0/16#cidr: 10.244.0.0/16#' custom-resources.yaml
+
+kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+```
+
+### Taint the master node allow workload
+```bash
+kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+```
+
+### install metrics server
+```bash
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+helm install --set 'args={--kubelet-insecure-tls}' --namespace kube-system metrics metrics-server/metrics-server
 ```
