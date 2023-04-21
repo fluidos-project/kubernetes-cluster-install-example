@@ -134,5 +134,40 @@ chmod 700 get_helm.sh
 ./get_helm.sh
 rm get_helm.sh
 helm completion bash | sudo tee /etc/bash_completion.d/helm &>/dev/null
+source <(helm completion bash)
+```
+
+### KubeVIP
+
+- put all the interfaces to `etho` using netplan yaml on each machine
+
+- Put nodes names and ip on `/etc/hosts` on each machine
+
+- rob-node-00 -> 192.168.2.100
+
+- rob-node-01 -> 192.168.2.101
+
+- rob-node-02 -> 192.168.2.102
+
+- DHCP range 192.168.2.50-192.168.2.200
+
+- Virtual IP -> 192.168.2.10
+
+- Do the kube-vip config on each node
+
+```bash
+sudo apt install -y jq
+export VIP=192.168.2.10
+export INTERFACE=eth0
+export KVVERSION=$(curl -sL https://api.github.com/repos/kube-vip/kube-vip/releases | jq -r ".[0].name")
+alias kube-vip="sudo ctr image pull ghcr.io/kube-vip/kube-vip:$KVVERSION; sudo ctr run --rm --net-host ghcr.io/kube-vip/kube-vip:$KVVERSION vip /kube-vip"
+kube-vip manifest pod \
+    --interface $INTERFACE \
+    --address $VIP \
+    --controlplane \
+    --services \
+    --arp \
+    --leaderElection | sudo tee /etc/kubernetes/manifests/kube-vip.yaml
+```
 
 ```
