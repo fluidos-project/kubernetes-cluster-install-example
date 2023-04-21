@@ -51,10 +51,31 @@ net.ipv4.ip_forward                 = 1
 EOF
 ```
 
-### Apply sysctl parameters without rebooting to current running environment
+#### Apply sysctl parameters without rebooting to current running environment
 
 ```bash
 sudo sysctl --system
+```
+### Configure ufw firewall
+
+#### Master nodes
+```bash
+sudo ufw allow "OpenSSH"
+sudo ufw allow 6443/tcp
+sudo ufw allow 2379:2380/tcp
+sudo ufw allow 10250/tcp
+sudo ufw allow 10259/tcp
+sudo ufw allow 10257/tcp
+sudo ufw enable
+sudo ufw status
+```
+#### Worker nodes
+```bash
+sudo ufw allow "OpenSSH"
+sudo ufw allow 10250/tcp
+sudo ufw allow 30000:32767/tcp
+sudo ufw enable
+sudo ufw status
 ```
 
 ### Install containerd
