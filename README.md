@@ -226,7 +226,7 @@ helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 helm install --set 'args={--kubelet-insecure-tls}' --namespace kube-system metrics metrics-server/metrics-server
 ```
 
-#### liqo
+### liqo install
 ```bash
 curl --fail -LS "https://github.com/liqotech/liqo/releases/download/v0.7.2/liqoctl-linux-amd64.tar.gz" | tar -xz
 sudo install -o root -g root -m 0755 liqoctl /usr/local/bin/liqoctl
@@ -234,4 +234,14 @@ liqoctl completion bash | sudo tee /etc/bash_completion.d/liqoctl &>/dev/null
 source <(liqoctl completion bash)
 rm liqoctl
 rm LICENSE
+```
+
+### install k9s
+```bash
+export K9S_VERSION=0.27.3
+wget https://github.com/derailed/k9s/releases/download/v0.27.3/k9s_Linux_amd64.tar.gz -O /tmp/k9s_Linux_amd64.tar.gz
+cd /tmp
+tar -xaf k9s_Linux_amd64.tar.gz
+test -d ~/.local/bin && mv k9s ~/.local/bin/k9s || sudo mv k9s /usr/local/bin/k9s
+cd -
 ```
