@@ -200,12 +200,19 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 ### Install calico CNI
 ```bash
-export CALICO_VERSION=3.25.0
+export CALICO_VERSION=3.25.1
 curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/tigera-operator.yaml -O
 kubectl create -f tigera-operator.yaml
 curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/custom-resources.yaml -O
 sed -i 's#cidr: 192.168.0.0/16#cidr: 10.244.0.0/16#' custom-resources.yaml
 kubectl create -f custom-resources.yaml
+```
+
+### Install calicoctl
+```bash
+curl -L https://github.com/projectcalico/calico/releases/latest/download/calicoctl-linux-amd64 -o calicoctl
+chmod +x ./calicoctl
+test -d ~/.local/bin && mv calicoctl .local/bin/calicoctl || sudo mv calicoctl /usr/local/bin/calicoctl
 ```
 
 ### Taint the master node allow workload
