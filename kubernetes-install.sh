@@ -28,7 +28,7 @@ EOF
 sudo sysctl --system
 
 sudo apt update
-export K8S_VERSION="1.27.1-00"
+export K8S_VERSION="1.26.3-00"
 sudo apt install -y \
     containerd.io \
     kubeadm="${K8S_VERSION}" \
