@@ -1,65 +1,376 @@
----
-version: 1
-reporting:
-    hook:
-        type: webhook
-        endpoint: http://example.com/endpoint/path
-early-commands:
-    - ping -c1 198.162.1.1
-locale: en_US
-keyboard:
-    layout: gb
-    variant: dvorak
-network:
-    network:
-        version: 2
-        ethernets:
-            enp0s25:
-               dhcp4: yes
-            enp3s0: {}
-            enp4s0: {}
-        bonds:
-            bond0:
-                dhcp4: yes
-                interfaces:
-                    - enp3s0
-                    - enp4s0
-                parameters:
-                    mode: active-backup
-                    primary: enp3s0
-proxy: http://squid.internal:3128/
-apt:
-    primary:
-        - arches: [default]
-          uri: http://repo.internal/
-    sources:
-        my-ppa.list:
-            source: "deb http://ppa.launchpad.net/curtin-dev/test-archive/ubuntu $RELEASE main"
-            keyid: B59D 5F15 97A5 04B7 E230  6DCA 0620 BBCF 0368 3F77
-storage:
-    layout:
-        name: lvm
-identity:
-    hostname: hostname
-    username: username
-    password: $crypted_pass
-ssh:
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    hostname: rob-node-000
+    realname: Robotnik Automation S.L.
+    username: edge
+    password: $6$0/CRYJLMihw/N/Ad$LodWk0RHv3HxQDdDj7tdunz2Cdq2kVYFei.q0/6FmOqRi/bcQGfbTpizVFJsb.iB49FVFgtxGLw.RgVbXooB9.
+  refresh-installer:
+  update: yes
+  locale: en_US
+  keyboard:
+    layout: es
+    # variant: es
+  source:
+    id: "ubuntu-server"
+  ssh:
     install-server: yes
     authorized-keys:
-      - $key
-    allow-pw: no
-snaps:
-    - name: go
-      channel: 1.14/stable
-      classic: true
-debconf-selections: |
-    bind9      bind9/run-resolvconf    boolean false
-packages:
-    - libreoffice
-    - dns-server^
-user-data:
-    disable_root: false
-late-commands:
-    - sed -ie 's/GRUB_TIMEOUT=.\*/GRUB_TIMEOUT=30/' /target/etc/default/grub
-error-commands:
-    - tar c /var/log/installer | nc 192.168.0.1 1000
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtkQFf7sa+G1oAGkPC2fMR+qOqcE651SToEyVbR6aDFR9kYLSFLvzUA1W+hjDsI1uL5SuOQju1kDDDnNO0SjQOsffqw44L3D9CXqNPIAGs+6lBffDGd9A6e5yLpOuaXM5t9dMBq2SWV2Frq8gu0CR3NyHtFCzu87ghlKzaelaGWdIeyR+2HqtQr3t+ykCF5u0/+MLGWEHISpl+aV17+lvRB8qRNE0hZm7lSWTgJ2gRFVIGy69tsUCYf9+0KJDkM3sfvxzM2HyKNN60gkGDTH0BA4/ZTzqs8qbCylD1Jhgl+0ZNaIg6OkhyFBzESxrQpQkexOTtygtpv6YJM2liZTV7
+    allow-pw: yes
+  updates: all
+  apt:
+    mirror-selection:
+      primary:
+        - uri: http://archive.ubuntu.com/ubuntu
+    sources:
+      docker.list:
+        source: >
+          deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
+        keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+      kubernetes.list:
+        source: >
+          deb [arch=amd64] https://apt.kubernetes.io/ kubernetes-xenial main
+        keyid: A362B822F6DEDC652817EA46B53DC80D13EDEF05
+  network:
+    network:
+      version: 2
+      ethernets:
+        eth0:
+          dhcp4: yes
+          optional: yes
+        eth1:
+          dhcp4: yes
+          optional: true
+  storage:
+    layout:
+      name: lvm
+      match:
+        ssd: yes
+      sizing-policy: scaled
+  packages:
+    - gnupg2
+    - apt-transport-https
+    - jq
+    - powerline
+    - fonts-powerline
+    # - fzf
+    - ack-grep
+    - net-tools
+    - containerd.io
+    - docker-ce
+    - docker-ce-cli
+    - docker-compose-plugin
+    # kube tools package order matters (version specific)
+    - kubelet=1.26.3-00
+    - kubectl=1.26.3-00
+    - kubeadm=1.26.3-00
+  late-commands:
+    - sed -i 's#^/swap.img#\#/swap.img#' /target/etc/fstab
+    - >
+      curtin in-target --target=/target --
+      apt-mark hold kubelet kubeadm kubectl
+    - >
+      curtin in-target --target=/target --
+      ufw allow "OpenSSH"
+    - >
+      curtin in-target --target=/target --
+      ufw allow 6443/tcp
+    - >
+      curtin in-target --target=/target --
+      ufw allow 2379:2380/tcp
+    - >
+      curtin in-target --target=/target --
+      ufw allow 10250/tcp
+    - >
+      curtin in-target --target=/target --
+      ufw allow 10259/tcp
+    - >
+      curtin in-target --target=/target --
+      ufw allow 10257/tcp
+    - >
+      curtin in-target --target=/target --
+      ufw allow 179/tcp
+    - >
+      curtin in-target --target=/target --
+      ufw allow 4789/udp
+    - >
+      curtin in-target --target=/target --
+      ufw allow 4789/tcp
+    - >
+      curtin in-target --target=/target --
+      ufw allow 2379/tcp
+    - >
+      curtin in-target --target=/target --
+      ufw enable
+    - >
+      curtin in-target --target=/target --
+      curl -fsSL -o get_helm.sh
+      https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    - >
+      curtin in-target --target=/target --
+      chmod 700 get_helm.sh
+    - >
+      curtin in-target --target=/target --
+      ./get_helm.sh
+    - >
+      curtin in-target --target=/target --
+      rm get_helm.sh
+    - >
+      curtin in-target --target=/target --
+      kubeadm completion bash | tee /etc/bash_completion.d/kubeadm &>/dev/null
+    - >
+      curtin in-target --target=/target --
+      kubectl completion bash | tee /etc/bash_completion.d/kubectl &>/dev/null
+    - >
+      curtin in-target --target=/target --
+      helm completion bash | tee /etc/bash_completion.d/helm &>/dev/null
+  user-data:
+    write_files:
+      - path: /etc/modules-load.d/k8s.conf
+        permissions: '0644'
+        content: |
+          overlay
+          br_netfilter
+      - path: /etc/sysctl.d/k8s.conf
+        permissions: '0644'
+        content: |
+          net.bridge.bridge-nf-call-iptables  = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.ipv4.ip_forward                 = 1
+      - path: /usr/local/bin/update_k9s
+        permissions: '0755'
+        content: |
+          #!/bin/bash
+          # Description:   k9s updater
+          # Company:       Robotnik Automation S.L.L.
+          # Creation Year: 2023
+          # Author:        Guillem Gari <ggari@robotnik.es>
+          #
+          #
+          # Copyright (c) 2023, Robotnik Automation S.L.
+          # All rights reserved.
+          #
+          # Redistribution and use in source and binary forms, with or without
+          # modification, are permitted provided that the following conditions are met:
+          #     * Redistributions of source code must retain the above copyright
+          #       notice, this list of conditions and the following disclaimer.
+          #     * Redistributions in binary form must reproduce the above copyright
+          #       notice, this list of conditions and the following disclaimer in the
+          #       documentation and/or other materials provided with the distribution.
+          #     * Neither the name of the Robotnik Automation S.L.L. nor the
+          #       names of its contributors may be used to endorse or promote products
+          #       derived from this software without specific prior written permission.
+          #
+          # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+          # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+          # THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+          # PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Robotnik Automation S.L.L.
+          # BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+          # OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+          # PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+          # OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+          # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+          # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+          # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+          #Colour
+          red_colour='\033[0;31m'
+          green_colour='\033[0;32m'
+          light_purple_colour='\033[1;35m'
+          err_colour="${red_colour}"
+          nfo_colour="${light_purple_colour}"
+          suc_colour="${green_colour}"
+          no_colour='\033[0m'
+
+          tool_list=(\
+            git \
+            curl \
+            wget \
+            jq \
+            tar \
+          )
+
+          # url & files
+          github_api_url="https://api.github.com"
+          github_url="https://github.com"
+          github_k9s_user="derailed"
+          k9s_repo="k9s"
+          k9s_version_url="${github_api_url}/repos/${github_k9s_user}/${k9s_repo}/releases"
+          k9s_pkg="k9s_Linux_amd64.tar.gz"
+          k9s_local_pkg="/tmp/${k9s_pkg}"
+          k9s_download_url='${github_url}/${github_k9s_user}/${k9s_repo}/releases/download/${K9S_VERSION}/${k9s_pkg}'
+
+          #commands
+          check_local_k9s_command='k9s version &>/dev/null'
+          local_k9s_version_command='$(k9s version | grep Version | sed "s#.*:* ##")'
+          get_last_version_command='$(curl -sL ${k9s_version_url} | jq -r ".[0].name")'
+          download_last_version_command='rm -rf ${k9s_local_pkg} && wget ${k9s_download_url} -q -O ${k9s_local_pkg}'
+          install_k9s_command='cd /tmp && tar -xaf ${k9s_local_pkg} && mv /tmp/k9s /usr/local/bin/k9s && rm -rf ${k9s_local_pkg}'
+
+          err_str_root_permission="You need root privileges try:\nsudo ${0}"
+
+          nfo_str_tool_checking='Checking tools'
+          suc_str_tool_check_success='All required tools are available'
+
+          nfo_check_system="Scanning local system"
+
+          suc_str_local_version_k9s='k9s local version ${K9S_LOCAL_VERSION}'
+          err_str_local_version_k9s='could not retrieve k9s local version'
+          suc_str_available_version_k9s='k9s last avaible version ${K9S_VERSION}'
+          err_str_available_version_k9s='could not retrieve k9s last available version'
+
+          nfo_str_update_k9s='Updating k9s to ${K9S_VERSION}'
+          succ_str_k9s_already_updated='Already on the k9s version'
+          err_str_update_k9s='Error updateing k9s'
+          suc_str_update_k9s='k9s updated to ${K9S_VERSION}'
+
+
+          function print_error() {
+            local message="${1}"
+            eval "echo -e "'"'"${err_colour}[ERROR]${no_colour}:   ${message}"'"'" 2>&1"
+          }
+
+          function print_info() {
+            local message="${1}"
+            eval "echo -e "'"'"${nfo_colour}[INFO]${no_colour}:    ${message}"'"'""
+          }
+
+          function print_success() {
+            local message="${1}"
+            eval "echo -e "'"'"${suc_colour}[SUCCESS]${no_colour}: ${message}"'"'""
+          }
+
+          function check_root_permission() {
+            if [[ "${EUID}" = 0 ]]; then
+              return 0
+            else
+              print_error "${err_str_root_permission}"
+              return 1
+            fi
+          }
+
+          function tool_check() {
+            local binary="${1}"
+            if [[ -z "${binary}" ]];then
+              return 1
+            fi
+            eval "${tool_check_cmd}"
+            return $?
+          }
+
+          function tools_check() {
+            local tools=("${@}")
+            print_info "${nfo_str_tool_checking}"
+            for tool in "${tools[@]}"; do
+              if ! tool_check "${tool}"; then
+                print_error "${err_str_required_tool_not_found}"
+                return 1
+              fi
+            done
+            print_success "${suc_str_tool_check_success}"
+            return 0
+          }
+
+          function check_k9s_exits() {
+            eval "${check_local_k9s_command}"
+            return $?
+          }
+
+          function check_k9s_version() {
+            eval "K9S_LOCAL_VERSION=${local_k9s_version_command}"
+            return $?
+          }
+
+          function get_last_available_k9s_version() {
+            if ! eval "K9S_VERSION=${get_last_version_command}"; then
+              print_error "${err_str_available_version_k9s}"
+              return 1
+            fi
+            return 0
+          }
+
+          function there_is_k9s_update() {
+            print_info "${nfo_check_system}"
+            if ! get_last_available_k9s_version; then
+              return 1
+            fi
+            if ! check_k9s_exits; then
+              return 0
+            fi
+            if ! check_k9s_version; then
+              return 1
+            fi
+            if [[ ${K9S_LOCAL_VERSION} == ${K9S_VERSION} ]]; then
+              print_success "${succ_str_k9s_already_updated}"
+              return 1
+            fi
+            print_success "${suc_str_available_version_k9s}"
+            return 0
+          }
+
+          function download_k9s(){
+            eval "k9s_download_url=${k9s_download_url}"
+            eval "${download_last_version_command}"
+            return $?
+          }
+
+          function install_k9s() {
+            eval "${install_k9s_command}"
+            return $?
+          }
+
+          function update_k9s() {
+            print_info "${nfo_str_update_k9s}"
+            if ! download_k9s; then
+              print_err "${err_str_update_k9s}"
+              return 1
+            fi
+            if ! install_k9s; then
+              print_err "${err_str_update_k9s}"
+              return 1
+            fi
+            print_success "${suc_str_update_k9s}"
+            return 0
+          }
+
+          function main() {
+            if ! check_root_permission; then
+              return 1
+            fi
+            if ! tools_check "${tool_list[@]}"; then
+              return 1
+            fi
+            if ! there_is_k9s_update; then
+              return 0
+            fi
+            if ! update_k9s; then
+              return 1
+            fi
+            return 0
+          }
+
+          main "${@}"
+          exit $?
+    runcmd:
+      - systemctl stop containerd
+      - mkdir -p /etc/containerd
+      - touch /etc/containerd/config.toml
+      - containerd config default > /etc/containerd/config.toml
+      - >
+        sed -i
+        's/SystemdCgroup = false/SystemdCgroup = true/'
+        /etc/containerd/config.toml
+      - systemctl start containerd
+      - systemctl enable containerd
+      - groupadd docker
+      - usermod -aG docker edge
+      - /usr/local/bin/update_k9s
+      - >
+        sudo -u edge
+        git clone --depth 1
+        https://github.com/junegunn/fzf.git
+        /home/edge/.fzf
+      - sudo -u edge /home/edge/.fzf/install --all
+      - echo "source /usr/share/powerline/bindings/bash/powerline.sh" >>/home/edge/.bashrc
