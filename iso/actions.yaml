@@ -1,0 +1,12 @@
+- name: add-cmdline-arg
+  arg: autoinstall ip=dhcp ds=nocloud-net\;s=http://192.168.20.165:3003/edge/
+  persist: false
+- name: add-cmdline-arg
+  arg: net.ifnames=0 biosdevname=0
+  persist: true
+# - name: add-snap-from-store
+#   snap_name: subiquity
+#   channel: stable
+# - name: cp
+#   source: ./grub.cfg
+#   dest: /boot/grub/grub.cfg
