@@ -228,6 +228,27 @@ helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 helm install --set 'args={--kubelet-insecure-tls}' --namespace kube-system metrics metrics-server/metrics-server
 ```
 
+### install metallb
+```bash
+helm repo add metallb https://metallb.github.io/metallb
+helm install --create-namespace --namespace metallb-system metallb metallb/metallb
+```
+#### Configure metallb
+```bash
+export METALLB_IP_POD="192.168.2.210-192.168.1.219"
+cat <<EOF > metallb-config.yaml
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: first-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - ${METALLB_IP_POD}
+EOF
+kubectl apply -f metallb-config.yaml
+```
+
 ### liqo install
 ```bash
 curl --fail -LS "https://github.com/liqotech/liqo/releases/download/v0.7.2/liqoctl-linux-amd64.tar.gz" | tar -xz
