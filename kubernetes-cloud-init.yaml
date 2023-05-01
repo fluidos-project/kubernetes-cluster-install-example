@@ -117,15 +117,6 @@ autoinstall:
     - >
       curtin in-target --target=/target --
       rm get_helm.sh
-    - >
-      curtin in-target --target=/target --
-      kubeadm completion bash | tee /etc/bash_completion.d/kubeadm &>/dev/null
-    - >
-      curtin in-target --target=/target --
-      kubectl completion bash | tee /etc/bash_completion.d/kubectl &>/dev/null
-    - >
-      curtin in-target --target=/target --
-      helm completion bash | tee /etc/bash_completion.d/helm &>/dev/null
   user-data:
     write_files:
       - path: /etc/modules-load.d/k8s.conf
@@ -364,6 +355,10 @@ autoinstall:
         /etc/containerd/config.toml
       - systemctl start containerd
       - systemctl enable containerd
+      - kubeadm config images pull
+      - kubeadm completion bash | tee /etc/bash_completion.d/kubeadm &>/dev/null
+      - kubectl completion bash | tee /etc/bash_completion.d/kubectl &>/dev/null
+      - helm completion bash | tee /etc/bash_completion.d/helm &>/dev/null
       - groupadd docker
       - usermod -aG docker edge
       - /usr/local/bin/update_k9s
