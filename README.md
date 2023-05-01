@@ -200,6 +200,11 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
+### Taint the master node allow workload
+```bash
+kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+```
+
 ### Install calico CNI
 ```bash
 export CALICO_VERSION=3.25.1
@@ -215,11 +220,6 @@ kubectl create -f custom-resources.yaml
 curl -L https://github.com/projectcalico/calico/releases/latest/download/calicoctl-linux-amd64 -o calicoctl
 chmod +x ./calicoctl
 test -d ~/.local/bin && mv calicoctl .local/bin/calicoctl || sudo mv calicoctl /usr/local/bin/calicoctl
-```
-
-### Taint the master node allow workload
-```bash
-kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 ```
 
 ### install metrics server
