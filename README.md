@@ -147,6 +147,16 @@ helm completion bash | sudo tee /etc/bash_completion.d/helm &>/dev/null
 source <(helm completion bash)
 ```
 
+### install k9s
+```bash
+export K9S_VERSION="$(curl -sL https://api.github.com/repos/kube-vip/kube-vip/releases | jq -r ".[0].name")"
+wget https://github.com/derailed/k9s/releases/download/v0.27.3/k9s_Linux_amd64.tar.gz -O /tmp/k9s_Linux_amd64.tar.gz
+cd /tmp
+tar -xaf k9s_Linux_amd64.tar.gz
+test -d ~/.local/bin && mv k9s ~/.local/bin/k9s || sudo mv k9s /usr/local/bin/k9s
+cd -
+```
+
 ### KubeVIP
 
 - put all the interfaces to `etho` using netplan yaml on each machine
@@ -259,12 +269,5 @@ rm liqoctl
 rm LICENSE
 ```
 
-### install k9s
-```bash
-export K9S_VERSION="$(curl -sL https://api.github.com/repos/kube-vip/kube-vip/releases | jq -r ".[0].name")"
-wget https://github.com/derailed/k9s/releases/download/v0.27.3/k9s_Linux_amd64.tar.gz -O /tmp/k9s_Linux_amd64.tar.gz
-cd /tmp
-tar -xaf k9s_Linux_amd64.tar.gz
-test -d ~/.local/bin && mv k9s ~/.local/bin/k9s || sudo mv k9s /usr/local/bin/k9s
-cd -
-```
+
+
