@@ -63,9 +63,9 @@ autoinstall:
     - docker-ce-cli
     - docker-compose-plugin
     # kube tools package order matters (version specific)
-    - kubelet=1.26.3-00
-    - kubectl=1.26.3-00
-    - kubeadm=1.26.3-00
+    - kubelet=1.26.4-00
+    - kubectl=1.26.4-00
+    - kubeadm=1.26.4-00
   late-commands:
     - sed -i 's#^/swap.img#\#/swap.img#' /target/etc/fstab
     - >
