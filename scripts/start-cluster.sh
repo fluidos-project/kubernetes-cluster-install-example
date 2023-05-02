@@ -30,6 +30,13 @@ curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/m
 kubectl create -f tigera-operator.yaml || exit 1
 curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/custom-resources.yaml -O
 sed -i "s#cidr: 192.168.0.0/16#cidr: ${CIDR_NET}#" custom-resources.yaml || exit 1
+yq 'select(document_index == 0) | .spec.calicoNetwork.nodeAddressAutodetectionV4.skipInterface = "liqo.*"' custom-resources.yaml> custom-resources.yaml.1
+yq 'select(document_index == 1)' custom-resources.yaml> custom-resources.yaml.2
+echo "---" >custom-resources.yaml
+cat custom-resources.yaml.1>>custom-resources.yaml
+echo "---" >>custom-resources.yaml
+cat custom-resources.yaml.2>>custom-resources.yaml
+rm custom-resources.yaml.1 custom-resources.yaml.2
 kubectl create -f custom-resources.yaml || exit 1
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/ || exit 1
 helm install --set 'args={--kubelet-insecure-tls}' --namespace kube-system metrics metrics-server/metrics-server || exit 1
@@ -82,3 +89,4 @@ while [ $metallb_replicas -lt 1 ]; do
 	fi
 done
 liqoctl install kubeadm --cluster-name $CLUSTER_NAME || exit 1
+liqoctl generate peer-command
