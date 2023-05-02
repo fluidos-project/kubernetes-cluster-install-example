@@ -363,9 +363,8 @@ autoinstall:
 
           main "${@}"
           exit $?
-      - path: /home/edge/.cluster-init/environment
+      - path: /root/environment
         permissions: '0644'
-        owner: edge:edge
         content: |
           #for multimaster control plane
           export VIP=192.168.2.10
@@ -376,9 +375,8 @@ autoinstall:
           export CALICO_VERSION=3.25.1
           export METALLB_IP_POD="192.168.2.211-192.168.2.219"
           export CLUSTER_NAME=rob-cluster-01
-      - path: /home/edge/.cluster-init/start-cluster.sh
+      - path: /root/start-cluster.sh
         permissions: '0755'
-        owner: edge:edge
         content: |
           source ~/.cluster-init/environment
 
@@ -489,4 +487,12 @@ autoinstall:
         https://github.com/junegunn/fzf.git
         /home/edge/.fzf
       - sudo -u edge /home/edge/.fzf/install --all
-      - echo "source /usr/share/powerline/bindings/bash/powerline.sh" >>/home/edge/.bashrc
+      - mkdir -p /home/edge/.cluster-init
+      - mv /root/start-cluster.sh /home/edge/.cluster-init/
+      - mv /root/environment /home/edge/.cluster-init/
+      - chown -R edge:edge /home/edge/.cluster-init
+      - >
+        sudo -u edge
+        echo
+        "source /usr/share/powerline/bindings/bash/powerline.sh"
+        >>/home/edge/.bashrc
