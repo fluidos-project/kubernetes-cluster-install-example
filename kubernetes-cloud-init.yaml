@@ -117,6 +117,25 @@ autoinstall:
     - >
       curtin in-target --target=/target --
       rm get_helm.sh
+    - >
+      curl -L
+      https://github.com/projectcalico/calico/releases/latest/download/calicoctl-linux-amd64
+      -o
+      /target/usr/local/bin/calicoctl
+    - chmod +x /target/usr/local/bin/calicoctl
+    # # use this for 0.8.1 or any other version not the latest
+    # - >
+    #   curl -L
+    #   https://github.com/liqotech/liqo/releases/download/v0.8.1/liqoctl-linux-amd64
+    #   -o
+    #   /target/usr/local/bin/liqoctl
+    - >
+      curl -L
+      https://github.com/liqotech/liqo/releases/latest/download/liqoctl-linux-amd64
+      -o
+      /target/usr/local/bin/liqoctl
+    - chmod 0755 /target/usr/local/bin/liqoctl
+    - chown root:root /target/usr/local/bin/liqoctl
   user-data:
     write_files:
       - path: /etc/modules-load.d/k8s.conf
