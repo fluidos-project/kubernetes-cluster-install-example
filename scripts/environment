@@ -1,0 +1,9 @@
+#for multimaster control plane
+export VIP=192.168.1.210
+export MASTER_IP=192.168.1.26
+export MASTER_HOSTNAME=rob-node-03
+export INTERFACE=eth0
+export CIDR_NET=10.244.0.0/16
+export CALICO_VERSION=3.25.1
+export METALLB_IP_POD="192.168.2.211-192.168.2.219"
+export CLUSTER_NAME=rob-cluster-01
