@@ -379,6 +379,7 @@ autoinstall:
       - kubeadm completion bash | tee /etc/bash_completion.d/kubeadm &>/dev/null
       - kubectl completion bash | tee /etc/bash_completion.d/kubectl &>/dev/null
       - helm completion bash | tee /etc/bash_completion.d/helm &>/dev/null
+      - HOME=/root liqoctl completion bash | tee /etc/bash_completion.d/liqoctl &>/dev/null
       - groupadd docker
       - usermod -aG docker edge
       - >
