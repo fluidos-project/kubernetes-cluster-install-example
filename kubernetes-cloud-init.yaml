@@ -376,10 +376,10 @@ autoinstall:
       - systemctl enable containerd
       - kubeadm config images pull
       - /usr/local/bin/update_k9s
-      - kubeadm completion bash | tee /etc/bash_completion.d/kubeadm &>/dev/null
-      - kubectl completion bash | tee /etc/bash_completion.d/kubectl &>/dev/null
-      - helm completion bash | tee /etc/bash_completion.d/helm &>/dev/null
-      - HOME=/root liqoctl completion bash | tee /etc/bash_completion.d/liqoctl &>/dev/null
+      - kubeadm completion bash >/etc/bash_completion.d/kubeadm
+      - kubectl completion bash >/etc/bash_completion.d/kubectl
+      - helm completion bash >/etc/bash_completion.d/helm
+      - HOME=/root liqoctl completion bash >/etc/bash_completion.d/liqoctl
       - groupadd docker
       - usermod -aG docker edge
       - >
