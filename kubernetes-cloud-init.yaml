@@ -384,14 +384,6 @@ autoinstall:
       - usermod -aG docker edge
       - >
         sudo -u edge
-        helm repo add metallb
-        https://metallb.github.io/metallb
-      - >
-        sudo -u edge
-        helm repo add metrics-server
-        https://kubernetes-sigs.github.io/metrics-server/
-      - >
-        sudo -u edge
         git clone --depth 1
         https://github.com/junegunn/fzf.git
         /home/edge/.fzf
