@@ -245,7 +245,7 @@ helm install --create-namespace --namespace metallb-system metallb metallb/metal
 ```
 #### Configure metallb
 ```bash
-export METALLB_IP_POD="192.168.2.210-192.168.1.219"
+export METALLB_IP_POD="192.168.2.210-192.168.2.219"
 cat <<EOF > metallb-config.yaml
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
