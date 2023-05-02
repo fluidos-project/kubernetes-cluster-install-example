@@ -356,12 +356,12 @@ autoinstall:
       - systemctl start containerd
       - systemctl enable containerd
       - kubeadm config images pull
+      - /usr/local/bin/update_k9s
       - kubeadm completion bash | tee /etc/bash_completion.d/kubeadm &>/dev/null
       - kubectl completion bash | tee /etc/bash_completion.d/kubectl &>/dev/null
       - helm completion bash | tee /etc/bash_completion.d/helm &>/dev/null
       - groupadd docker
       - usermod -aG docker edge
-      - /usr/local/bin/update_k9s
       - >
         sudo -u edge
         helm repo add metallb
