@@ -247,6 +247,7 @@ helm install --create-namespace --namespace metallb-system metallb metallb/metal
 ```bash
 export METALLB_IP_POD="192.168.2.210-192.168.2.219"
 cat <<EOF > metallb-config.yaml
+---
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
@@ -255,6 +256,17 @@ metadata:
 spec:
   addresses:
     - ${METALLB_IP_POD}
+  autoAssign: true
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: first-pool
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - first-pool
+
 EOF
 kubectl apply -f metallb-config.yaml
 ```
