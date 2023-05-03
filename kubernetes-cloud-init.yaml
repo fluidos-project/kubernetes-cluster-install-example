@@ -415,7 +415,24 @@ autoinstall:
           sed -i "s#cidr: 192.168.0.0/16#cidr: ${CIDR_NET}#" custom-resources.yaml || exit 1
           yq 'select(document_index == 0) | .spec.calicoNetwork.nodeAddressAutodetectionV4.skipInterface = "liqo.*"' custom-resources.yaml> custom-resources.yaml.1
           yq 'select(document_index == 1)' custom-resources.yaml> custom-resources.yaml.2
-          echo "---" >custom-resources.yaml
+          cat <<EOF >> custom-resources.yaml.2
+            apiServerDeployment:
+              spec:
+                template:
+                  spec:
+                    affinity:
+                      nodeAffinity:
+                        requiredDuringSchedulingIgnoredDuringExecution:
+                          nodeSelectorTerms:
+                            - matchExpressions:
+                              - key: liqo.io/type
+                                operator: NotIn
+                                values:
+                                - virtual-node
+          EOF
+          sed -i 's#spec: {}#spec:#' custom-resources.yaml.2
+          rm custom-resources.yaml
+          touch custom-resources.yaml
           cat custom-resources.yaml.1>>custom-resources.yaml
           echo "---" >>custom-resources.yaml
           cat custom-resources.yaml.2>>custom-resources.yaml
