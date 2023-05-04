@@ -153,4 +153,13 @@ while [ $metallb_replicas -lt 1 ]; do
 	fi
 done
 liqoctl install kubeadm --cluster-name $CLUSTER_NAME || exit 1
+LIQO_SVC_PROTO=$(kubectl get services -n liqo liqo-gateway -o yaml \
+| \
+yq '.spec.ports.[] | select(.name == "wireguard") | .protocol | downcase' \
+)
+LIQO_SVC_PORT=$(kubectl get services -n liqo liqo-gateway -o yaml \
+| \
+yq '.spec.ports.[] | select(.name == "wireguard") | .port ' \
+)
+sudo ufw allow ${LIQO_SVC_PORT}/${LIQO_SVC_PROTO} || exit 1
 liqoctl generate peer-command
