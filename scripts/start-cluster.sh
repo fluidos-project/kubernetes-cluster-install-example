@@ -97,6 +97,11 @@ if [[ ${CNI_FLAVOR} == "calico" ]]; then
   rm custom-resources.yaml.1 custom-resources.yaml.2
   kubectl create -f custom-resources.yaml || exit 1
 fi
+kubectl get -n kube-system daemonsets.apps kube-proxy -o yaml >kube-proxy-ds.yaml
+yq -i '.spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms += [{ "matchExpressions" : [{"key": "liqo.io/type", "operator" : "NotIn", "values": [ "virtual-node"]}] }]' kube-proxy-ds.yaml
+kubectl delete -n kube-system daemonsets.apps kube-proxy
+kubectl apply -f kube-proxy-ds.yaml
+rm kube-proxy-ds.yaml
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/ || exit 1
 helm install --set 'args={--kubelet-insecure-tls}' --namespace kube-system metrics metrics-server/metrics-server || exit 1
 helm repo add metallb https://metallb.github.io/metallb || exit 1
