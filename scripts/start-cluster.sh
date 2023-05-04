@@ -69,36 +69,34 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config || exit 1
 
 #to allow the master to act as
 kubectl taint nodes --all node-role.kubernetes.io/control-plane- || exit 1
+if [[ ${CNI_FLAVOR} == "flannel" ]]; then
+  kubectl create ns kube-flannel
+  kubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged
+  helm repo add flannel https://flannel-io.github.io/flannel/
+  helm install flannel --set podCidr="${CIDR_NET}" --namespace kube-flannel flannel/flannel
+  # wget \
+  # https://raw.githubusercontent.com/flannel-io/flannel/v${FLANNEL_VERSION}/Documentation/kube-flannel.yml
+  # sed -i "s#\"Network\": \"10.244.0.0/16\"#\"Network\": \"${CIDR_NET}\"#" kube-flannel.yml
+  # kubectl apply -f kube-flannel.yml
+fi
+if [[ ${CNI_FLAVOR} == "calico" ]]; then
+  curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/tigera-operator.yaml -O || exit 1
+  kubectl create -f tigera-operator.yaml || exit 1
+  curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/custom-resources.yaml -O
 
-curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/tigera-operator.yaml -O || exit 1
-kubectl create -f tigera-operator.yaml || exit 1
-curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/custom-resources.yaml -O
-sed -i "s#cidr: 192.168.0.0/16#cidr: ${CIDR_NET}#" custom-resources.yaml || exit 1
-yq 'select(document_index == 0) | .spec.calicoNetwork.nodeAddressAutodetectionV4.skipInterface = "liqo.*"' custom-resources.yaml> custom-resources.yaml.1
-yq 'select(document_index == 1)' custom-resources.yaml> custom-resources.yaml.2
-cat <<EOF >> custom-resources.yaml.2
-  apiServerDeployment:
-    spec:
-      template:
-        spec:
-          affinity:
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                  - matchExpressions:
-                    - key: liqo.io/type
-                      operator: NotIn
-                      values:
-                      - virtual-node
-EOF
-sed -i 's#spec: {}#spec:#' custom-resources.yaml.2
-rm custom-resources.yaml
-touch custom-resources.yaml
-cat custom-resources.yaml.1>>custom-resources.yaml
-echo "---" >>custom-resources.yaml
-cat custom-resources.yaml.2>>custom-resources.yaml
-rm custom-resources.yaml.1 custom-resources.yaml.2
-kubectl create -f custom-resources.yaml || exit 1
+  sed -i "s#cidr: 192.168.0.0/16#cidr: ${CIDR_NET}#" custom-resources.yaml || exit 1
+  yq 'select(document_index == 0) | .spec.calicoNetwork.nodeAddressAutodetectionV4.skipInterface = "liqo.*"' custom-resources.yaml> custom-resources.yaml.1
+  yq -i '.spec.calicoNodeDaemonSet.spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms += [{ "matchExpressions" : [{"key": "liqo.io/type", "operator" : "NotIn", "values": [ "virtual-node"]}] }]' custom-resources.yaml.1
+  # yq -i '.spec.CSINodeDriverDaemonSet.spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms += [{ "matchExpressions" : [{"key": "liqo.io/type", "operator" : "NotIn", "values": [ "virtual-node"]}] }]' custom-resources.yaml.1
+  yq 'select(document_index == 1)' custom-resources.yaml> custom-resources.yaml.2
+  rm custom-resources.yaml
+  touch custom-resources.yaml
+  cat custom-resources.yaml.1>>custom-resources.yaml
+  echo "---" >>custom-resources.yaml
+  cat custom-resources.yaml.2>>custom-resources.yaml
+  rm custom-resources.yaml.1 custom-resources.yaml.2
+  kubectl create -f custom-resources.yaml || exit 1
+fi
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/ || exit 1
 helm install --set 'args={--kubelet-insecure-tls}' --namespace kube-system metrics metrics-server/metrics-server || exit 1
 helm repo add metallb https://metallb.github.io/metallb || exit 1
