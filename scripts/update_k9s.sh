@@ -1,6 +1,6 @@
 #!/bin/bash
 # Description:   k9s updater
-# Company:       Robotnik Automation S.L.L.
+# Company:       Robotnik Automation S.L.
 # Creation Year: 2023
 # Author:        Guillem Gari <ggari@robotnik.es>
 #
