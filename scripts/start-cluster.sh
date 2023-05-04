@@ -33,24 +33,35 @@
 
 source ~/.cluster-init/environment
 
-export KVVERSION=$(curl -sL https://api.github.com/repos/kube-vip/kube-vip/releases | jq -r ".[0].name")
+if [[ ${USE_VIP} == "true" ]]; then
+  export KVVERSION=$(curl -sL https://api.github.com/repos/kube-vip/kube-vip/releases | jq -r ".[0].name")
 
-sudo ctr image pull ghcr.io/kube-vip/kube-vip:$KVVERSION || exit 1
-sudo ctr run --rm --net-host ghcr.io/kube-vip/kube-vip:$KVVERSION vip /kube-vip \
-manifest pod \
-    --interface $INTERFACE \
-    --address $VIP \
-    --controlplane \
-    --services \
-    --arp \
-    --leaderElection | sudo tee /etc/kubernetes/manifests/kube-vip.yaml || exit 1
-sudo kubeadm init \
---pod-network-cidr=${CIDR_NET} \
---apiserver-advertise-address=${MASTER_IP} \
---control-plane-endpoint ${VIP}:6443 \
---cri-socket unix:///var/run/containerd/containerd.sock \
---upload-certs \
---apiserver-cert-extra-sans=127.0.0.1,${MASTER_HOSTNAME},${MASTER_IP} || exit 1
+  sudo ctr image pull ghcr.io/kube-vip/kube-vip:$KVVERSION || exit 1
+  sudo ctr run --rm --net-host ghcr.io/kube-vip/kube-vip:$KVVERSION vip /kube-vip \
+  manifest pod \
+      --interface $INTERFACE \
+      --address $VIP \
+      --controlplane \
+      --services \
+      --arp \
+      --leaderElection | sudo tee /etc/kubernetes/manifests/kube-vip.yaml || exit 1
+  sudo kubeadm init \
+  --pod-network-cidr=${CIDR_NET} \
+  --apiserver-advertise-address=${MASTER_IP} \
+  --control-plane-endpoint ${VIP}:6443 \
+  --cri-socket unix:///var/run/containerd/containerd.sock \
+  --upload-certs \
+  --apiserver-cert-extra-sans=127.0.0.1,${MASTER_HOSTNAME},${MASTER_IP} || exit 1
+else
+  sudo kubeadm init \
+  --pod-network-cidr=${CIDR_NET} \
+  --apiserver-advertise-address=${MASTER_IP} \
+  --control-plane-endpoint ${MASTER_IP}:6443 \
+  --cri-socket unix:///var/run/containerd/containerd.sock \
+  --upload-certs \
+  --apiserver-cert-extra-sans=127.0.0.1,${MASTER_HOSTNAME},${MASTER_IP} || exit 1
+
+fi
 
 mkdir -p $HOME/.kube || exit 1
 sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config || exit 1
