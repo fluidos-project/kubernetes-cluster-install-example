@@ -126,16 +126,16 @@ spec:
 
 EOF
 metallb_replicas=0
+echo "Waiting for metallb to start up"
 while [ $metallb_replicas -lt 1 ]; do
-
 	metallb_replicas=0
 	replicas=$(kubectl get deployments.apps --namespace metallb-system metallb-controller -o json | jq -r ".status.readyReplicas")
 	if [[ $replicas =~ [0-9]+ ]]; then
 		metallb_replicas=$replicas
 	fi
 	if [ $metallb_replicas -ge 1 ]; then
-		echo "Metallb is up"
-		sleep 5
+		echo "\nMetallb is up"
+		sleep 2
 		echo "applying metallb configuration"
 		if kubectl apply -f metallb-config.yaml; then
 			break;
@@ -143,7 +143,7 @@ while [ $metallb_replicas -lt 1 ]; do
 			echo "retry metallb configuration apply"
 		fi
 	else
-		echo "Waiting for metallb to start up"
+		echo -n "."
 		sleep 5
 	fi
 done
