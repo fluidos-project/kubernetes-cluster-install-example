@@ -2,10 +2,12 @@
 autoinstall:
   version: 1
   identity:
-    hostname: rob-node-000
-    realname: Robotnik Automation S.L.
+    hostname: fluidos-node-00
+    realname: Fluidos cluster user
     username: edge
-    password: $6$0/CRYJLMihw/N/Ad$LodWk0RHv3HxQDdDj7tdunz2Cdq2kVYFei.q0/6FmOqRi/bcQGfbTpizVFJsb.iB49FVFgtxGLw.RgVbXooB9.
+    # mkpasswd -m sha-512
+    # Password: fluidos
+    password: $6$D.jfv7J8MZ27ohBd$nUqO0YhzbTbwdWXCaH..oHUtG9o0p2r6P7TONXbEMsH5Zz7aHSwTI1D/WBxv6FP2dfQEfJHGN3RQUG67VKJuD1
   refresh-installer:
   update: yes
   locale: en_US
@@ -372,7 +374,7 @@ autoinstall:
           #for multimaster control plane
           export VIP=192.168.2.10
           export MASTER_IP=192.168.2.100
-          export MASTER_HOSTNAME=rob-node-00
+          export MASTER_HOSTNAME=fluidos-node-00
           export INTERFACE=eth0
           export CIDR_NET=10.244.0.0/16
           export USE_VIP=true
@@ -380,7 +382,7 @@ autoinstall:
           export CALICO_VERSION=3.25.1
           export FLANNEL_VERSION=0.21.4
           export METALLB_IP_POD="192.168.2.211-192.168.2.219"
-          export CLUSTER_NAME=rob-cluster-00
+          export CLUSTER_NAME=fluidos-cluster-00
       - path: /root/destroy-cluster.sh
         permissions: '0755'
         content: |
