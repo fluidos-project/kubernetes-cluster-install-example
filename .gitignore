@@ -1,0 +1,3 @@
+iso/livefs-editor/*
+!iso/livefs-editor/actions.yaml
+*.iso
