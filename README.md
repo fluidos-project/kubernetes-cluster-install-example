@@ -78,3 +78,18 @@ sudo livefs-edit $(ls ubuntu-*-*.iso | tail -n1) rob-ci-$(ls ubuntu-*-*.iso | ta
 6. Remove the pendrive
 7. restart the machine
 8. Wait till cloud init runs all the first boot commands
+
+
+## Kubernetes cluster startup
+
+- Log in to the machine
+- edit the file `.cluster-init/environment` accordingly with your need and ip ranges
+- execute the following command
+```bash
+.cluster-init/start-cluster.sh
+```
+## Kubernetes cluster destroy
+- execute the following command
+```bash
+.cluster-init/destroy-cluster.sh
+```
