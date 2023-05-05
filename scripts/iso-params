@@ -1,0 +1,5 @@
+#!/bin/bash
+ubuntu_distro="jammy"
+iso_base_url="https://releases.ubuntu.com"
+shasum_file=SHA256SUMS
+distro_type="live-server"
