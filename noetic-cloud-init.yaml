@@ -148,6 +148,12 @@ autoinstall:
       -O yq
     - chmod +x yq
     - mv yq /target/usr/local/bin/yq
+    - >
+      wget
+      https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
+      -O /target/root/install_geographiclib_datasets.sh
+    - chmod +x /target/root/install_geographiclib_datasets.sh
+    - >
   user-data:
     write_files:
       # - path: /etc/modules-load.d/k8s.conf
@@ -256,6 +262,7 @@ autoinstall:
         /etc/default/grub
       - update-grub
       - >
+      - /root/install_geographiclib_datasets.sh
       - mv /root/screenrc /home/robot/.screenrc
       - chown robot:robot /home/robot/.screenrc
       - >
