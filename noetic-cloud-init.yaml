@@ -33,10 +33,10 @@ autoinstall:
         source: >
           deb [arch=amd64] http://packages.ros.org/ros/ubuntu focal main
         keyid: C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-      # anydesk.list:
-      #   source: >
-      #     deb [arch=amd64] http://deb.anydesk.com/ all main
-      #   keyid: D56311E5FF3B6F39D5A16ABE18DF3741CDFFDE29
+      anydesk.list:
+        source: >
+          deb [arch=amd64] http://deb.anydesk.com/ all main
+        keyid: D56311E5FF3B6F39D5A16ABE18DF3741CDFFDE29
       chrome.list:
         source: >
           deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main
@@ -66,7 +66,7 @@ autoinstall:
       channel: stable
       classic: false
   packages:
-    # - anydesk
+    - anydesk
     - chromium-browser
     - google-chrome-stable
     - gnupg2
