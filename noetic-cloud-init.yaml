@@ -197,7 +197,7 @@ autoinstall:
       - >
         sudo -u robot
         echo
-        "source export ROS_MASTER_URI='http://$HOSTNAME:11311'"
+        'export ROS_MASTER_URI="http://$(hostname):11311"'
         >>/home/robot/.bashrc
       - >
         sudo -u robot
