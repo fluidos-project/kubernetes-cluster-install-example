@@ -273,6 +273,26 @@ autoinstall:
         make NET=NO_NETDEV_SUPPORT &&
         make install
       - /root/install_geographiclib_datasets.sh
+      - >
+        git clone https://github.com/tomojitakasu/RTKLIB.git /opt/RTKLIB
+      - >
+        cd /opt/RTKLIB/app &&
+        chmod +x makeall.sh &&
+        ./makeall.sh
+      - >
+        git clone
+        https://github.com/nimbuscontrols/EIPScanner
+        /root/EIPScanner &&
+        cd /root/EIPScanner &&
+        git checkout 1.3.0 &&
+        mkdir build &&
+        cd build &&
+        cmake ..
+      - >
+        cd /root/EIPScanner/build &&
+        cmake --build . --target install &&
+        cd .. &&
+        rm -rf EIPScanner
       - mv /root/screenrc /home/robot/.screenrc
       - chown robot:robot /home/robot/.screenrc
       - >
