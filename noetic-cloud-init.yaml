@@ -150,6 +150,14 @@ autoinstall:
     - mv yq /target/usr/local/bin/yq
     - >
       wget
+      https://download.teamviewer.com/download/linux/teamviewer_amd64.deb
+      -O /target/root/teamviewer_amd64.deb
+    - >
+      wget
+      https://github.com/rustdesk/rustdesk/releases/download/1.1.9/rustdesk-1.1.9.deb
+      -O /target/root/rustdesk.deb
+    - >
+      wget
       https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
       -O /target/root/install_geographiclib_datasets.sh
     - chmod +x /target/root/install_geographiclib_datasets.sh
@@ -293,6 +301,9 @@ autoinstall:
         cmake --build . --target install &&
         cd .. &&
         rm -rf EIPScanner
+      - hostnamectl set-chassis vm
+      - apt install ./root/teamviewer_amd64.deb
+      - apt install ./root/rustdesk.deb
       - mv /root/screenrc /home/robot/.screenrc
       - chown robot:robot /home/robot/.screenrc
       - >
