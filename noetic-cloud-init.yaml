@@ -165,6 +165,37 @@ autoinstall:
         permissions: '0644'
         content: |
           KERNEL=="js[0-9]*", SUBSYSTEM=="input", ATTRS{name}=="Wireless Controller", SYMLINK+="input/js_base"
+      - path: /etc/gdm3/custom.conf
+        permissions: '0644'
+        content: |
+          # GDM configuration storage
+          #
+          # See /usr/share/gdm/gdm.schemas for a list of available options.
+
+          [daemon]
+          # Uncomment the line below to force the login screen to use Xorg
+          WaylandEnable=false
+
+          # Enabling automatic login
+          AutomaticLoginEnable = true
+          AutomaticLogin = robot
+
+          # Enabling timed login
+          TimedLoginEnable = true
+          TimedLogin = robot
+          TimedLoginDelay = 0
+
+          [security]
+
+          [xdmcp]
+
+          [chooser]
+
+          [debug]
+          # Uncomment the line below to turn on debugging
+          # More verbose logs
+          # Additionally lets the X server dump core if it crashes
+          #Enable=true
       - path: /root/screenrc
         permissions: '0644'
         content: |
