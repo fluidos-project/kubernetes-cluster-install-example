@@ -130,11 +130,41 @@ autoinstall:
     - mv yq /target/usr/local/bin/yq
   user-data:
     write_files:
-      - path: /etc/modules-load.d/k8s.conf
+      # - path: /etc/modules-load.d/k8s.conf
+      #   permissions: '0644'
+      #   content: |
+      #     overlay
+      #     br_netfilter
+      - path: /etc/udev/rules.d/46-pcan.rules
         permissions: '0644'
         content: |
-          overlay
-          br_netfilter
+          # # Single unit
+          KERNEL=="pcanusb*", SYMLINK+="pcan_base", MODE="0666"
+          # # Mutliple units
+          # KERNEL=="pcanusb*", ATTRS{devid}=="40",SYMLINK+="pcan_traction", MODE="0666"
+          # KERNEL=="pcanusb*", ATTRS{devid}=="30",SYMLINK+="pcan_steer", MODE="0666"
+      - path: /etc/udev/rules.d/37-bluetooth-hci.rules
+        permissions: '0644'
+        content: |
+          # SUBSYSTEM=="usb", ATTRS{idVendor}=="your-vendor-id-here", ATTRS{idProduct}=="your-product-id-here", ATTR{authorized}="0"
+
+      - path: /etc/udev/rules.d/50-imu.rules
+        permissions: '0644'
+        content: |
+          # KERNEL=="ttyUSB[0-9]*", ATTRS{idProduct}=="6001", ATTRS{serial}=="FT91CQPY", NAME="%k", SYMLINK="ttyUSB_IMU", GROUP="dialout", MODE="0666"
+      - path: /etc/udev/rules.d/51-imu.rules
+        permissions: '0644'
+        content: |
+          # KERNEL=="ttyUSB[0-9]*", ATTRS{idProduct}=="6001", ATTRS{serial}=="FT91CQPY", NAME="%k", SYMLINK="ttyUSB_IMU", GROUP="dialout", MODE="0666"
+          # KERNEL=="ttyACM[0-9]*", ATTRS{idProduct}=="5740", NAME="%k", SYMLINK="ttyUSB_IMU", GROUP="dialout", MODE="0666"
+      - path: /etc/udev/rules.d/53-gps.rules
+        permissions: '0644'
+        content: |
+          KERNEL=="ttyACM[0-9]*", ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a9", NAME="%k", SYMLINK="ttyUSB_GPS", GROUP=$
+      - path: /etc/udev/55-dualsense.rules
+        permissions: '0644'
+        content: |
+          KERNEL=="js[0-9]*", SUBSYSTEM=="input", ATTRS{name}=="Wireless Controller", SYMLINK+="input/js_base"
     runcmd:
       - systemctl stop containerd
       - mkdir -p /etc/containerd
