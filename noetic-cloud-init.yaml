@@ -154,6 +154,12 @@ autoinstall:
       -O /target/root/install_geographiclib_datasets.sh
     - chmod +x /target/root/install_geographiclib_datasets.sh
     - >
+      wget
+      http://www.peak-system.com/fileadmin/media/linux/files/peak-linux-driver-8.16.0.tar.gz
+      -O /target/root/peak-linux-driver-8.16.0.tar.gz
+    - >
+      cd /target/root &&
+      tar -xzf peak-linux-driver-8.16.0.tar.gz
   user-data:
     write_files:
       # - path: /etc/modules-load.d/k8s.conf
@@ -262,6 +268,10 @@ autoinstall:
         /etc/default/grub
       - update-grub
       - >
+        cd /root/peak-linux-driver-8.16.0 &&
+        make clean &&
+        make NET=NO_NETDEV_SUPPORT &&
+        make install
       - /root/install_geographiclib_datasets.sh
       - mv /root/screenrc /home/robot/.screenrc
       - chown robot:robot /home/robot/.screenrc
