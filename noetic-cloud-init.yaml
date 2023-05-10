@@ -165,6 +165,14 @@ autoinstall:
         permissions: '0644'
         content: |
           KERNEL=="js[0-9]*", SUBSYSTEM=="input", ATTRS{name}=="Wireless Controller", SYMLINK+="input/js_base"
+      - path: /root/screenrc
+        permissions: '0644'
+        content: |
+          termcapinfo xterm* ti@:te@
+          shell -$SHELL
+          setenv LD_LIBRARY_PATH echo $CMAKE_PREFIX_PATH | awk '{split($1, a, ":"); print a[1];}'"/lib":/opt/ros/melodic/lib:/opt/ros/melodic/lib/x86_64-linux-gnu
+          zombie kr
+          verbose on
     runcmd:
       - systemctl stop containerd
       - mkdir -p /etc/containerd
@@ -178,6 +186,8 @@ autoinstall:
       - systemctl enable containerd
       - groupadd docker
       - usermod -aG docker robot
+      - mv /root/screenrc /home/robot/.screenrc
+      - chown robot:robot /home/robot/.screenrc
       - >
         sudo -u robot
         git clone --depth 1
