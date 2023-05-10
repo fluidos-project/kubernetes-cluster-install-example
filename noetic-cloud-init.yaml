@@ -224,6 +224,8 @@ autoinstall:
       - systemctl enable containerd
       - groupadd docker
       - usermod -aG docker robot
+      - usermod -aG dialout robot
+      - usermod -aG root robot
       - mv /root/screenrc /home/robot/.screenrc
       - chown robot:robot /home/robot/.screenrc
       - >
