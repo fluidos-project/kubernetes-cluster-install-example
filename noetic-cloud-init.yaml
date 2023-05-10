@@ -302,8 +302,8 @@ autoinstall:
         cd .. &&
         rm -rf EIPScanner
       - hostnamectl set-chassis vm
-      - apt install ./root/teamviewer_amd64.deb
-      - apt install ./root/rustdesk.deb
+      - apt install -y /root/teamviewer_amd64.deb
+      - apt install -y /root/rustdesk.deb
       - mv /root/screenrc /home/robot/.screenrc
       - chown robot:robot /home/robot/.screenrc
       - >
