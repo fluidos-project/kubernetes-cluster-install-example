@@ -209,3 +209,7 @@ autoinstall:
         echo
         "source /usr/share/powerline/bindings/bash/powerline.sh"
         >>/home/robot/.bashrc
+      - >
+        sudo -u robot
+        gsettings set org.gnome.desktop.interface enable-animations false
+      - reboot
