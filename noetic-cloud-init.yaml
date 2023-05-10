@@ -36,6 +36,7 @@ autoinstall:
   network:
     network:
       version: 2
+      # renderer: NetworkManager
       ethernets:
         eth0:
           dhcp4: yes
