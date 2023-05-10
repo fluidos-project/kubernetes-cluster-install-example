@@ -33,6 +33,14 @@ autoinstall:
         source: >
           deb [arch=amd64] http://packages.ros.org/ros/ubuntu focal main
         keyid: C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+      # anydesk.list:
+      #   source: >
+      #     deb [arch=amd64] http://deb.anydesk.com/ all main
+      #   keyid: D56311E5FF3B6F39D5A16ABE18DF3741CDFFDE29
+      chrome.list:
+        source: >
+          deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main
+        keyid: EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796
   network:
     network:
       version: 2
@@ -50,7 +58,17 @@ autoinstall:
       match:
         ssd: yes
       sizing-policy: all
+  snaps:
+    - name: code
+      channel: stable
+      classic: true
+    - name: remmina
+      channel: stable
+      classic: false
   packages:
+    # - anydesk
+    - chromium-browser
+    - google-chrome-stable
     - gnupg2
     - apt-transport-https
     - jq
@@ -113,6 +131,7 @@ autoinstall:
     - libpcap-dev
     - socat
     - ffmpeg
+    - python-is-python3
     - python3-pip
     - python3-catkin-tools
     - python3-bloom
