@@ -425,6 +425,7 @@ autoinstall:
       - sudo -u robot mkdir -p /home/robot/pictures
       - sudo -u robot mkdir -p /home/robot/videos
       - sudo -u robot mkdir -p /home/robot/.config/autostart
+      - sudo -u robot mkdir -p /home/robot/.local/bin
       - mv /root/gui-config.desktop /home/robot/.config/autostart/gui-config.desktop
       - chown robot:robot /home/robot/.config/autostart/gui-config.desktop
       - mv /root/gui-config /home/robot/.local/bin/gui-config
@@ -446,7 +447,6 @@ autoinstall:
         >>/home/robot/.bashrc
       - snap stop --disable canonical-livepatch
       - netplan apply
-      - sudo -u robot mkdir -p /home/robot/.local/bin
       - mv /root/.enable-vnc.sh /home/robot/.local/bin/vnc-enable
       - chown robot:robot /home/robot/.local/bin/vnc-enable
       # - >
