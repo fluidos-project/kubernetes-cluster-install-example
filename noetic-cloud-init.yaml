@@ -138,6 +138,8 @@ autoinstall:
     - meld
     - libmysql++3v5
     - libmysql++-dev
+    - vino
+    - gconf2
   late-commands:
     - >
       wget
