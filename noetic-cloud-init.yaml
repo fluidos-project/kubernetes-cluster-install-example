@@ -400,11 +400,13 @@ autoinstall:
       - chown robot:robot /home/robot/.screenrc
       - >
         sudo -u robot
+        bash -c '
         python3 -m pip install --upgrade pip &&
         python3 -m pip install pyjwt &&
         python3 -m pip install httplib2 &&
         python3 -m pip install requests &&
-        python3 -m pip install http.client &&
+        python3 -m pip install http.client
+        '
       - python3 -m pip install six==1.13.0
       - python3 -m pip install evdev==0.8.1
       - python3 -m pip install ds4drv
