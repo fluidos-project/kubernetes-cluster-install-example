@@ -180,7 +180,27 @@ autoinstall:
       cd /target/root &&
       tar -xzf peak-linux-driver-8.16.0.tar.gz &&
       rm peak-linux-driver-8.16.0.tar.gz
-    - sed -i 's#Prompt=lts#Prompt=never#' /target/etc/update-manager/release-upgrades
+    - >
+      wget
+      https://github.com/nimbuscontrols/EIPScanner/archive/refs/tags/1.3.0.tar.gz
+      -O /target/root/1.3.0.tar.gz &&
+      cd /target/root/ &&
+      tar -xaf 1.3.0.tar.gz &&
+      rm 1.3.0.tar.gz
+    - >
+      apt install git
+    - >
+      git clone --depth 1
+      https://github.com/junegunn/fzf.git
+      /target/root/fzf
+    - >
+      git clone --depth 1
+      https://github.com/tomojitakasu/RTKLIB.git
+      /target/opt/RTKLIB
+    - >
+      sed -i
+      's#Prompt=lts#Prompt=never#'
+      /target/etc/update-manager/release-upgrades
     - >
       curtin in-target --target=/target --
       systemctl set-default multi-user
@@ -337,26 +357,16 @@ autoinstall:
         make install &&
         rm -rf /root/peak-linux-driver-8.16.0
       - >
-        git clone https://github.com/tomojitakasu/RTKLIB.git /opt/RTKLIB
-      - >
         cd /opt/RTKLIB/app &&
         chmod +x makeall.sh &&
         ./makeall.sh
       - >
-        git clone
-        https://github.com/nimbuscontrols/EIPScanner
-        /root/EIPScanner &&
-        cd /root/EIPScanner &&
-        git checkout 1.3.0 &&
+        cd /root/EIPScanner-1.3.0 &&
         mkdir build &&
         cd build &&
         cmake .. &&
-        rm -f /root/EIPScanner
-      - >
-        cd /root/EIPScanner/build &&
         cmake --build . --target install &&
-        cd .. &&
-        rm -rf EIPScanner
+        rm -rf /root/EIPScanner-1.3.0
       - hostnamectl set-chassis vm
       - mv /root/screenrc /home/robot/.screenrc
       - chown robot:robot /home/robot/.screenrc
