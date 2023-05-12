@@ -345,6 +345,8 @@ autoinstall:
         content: |
           gsettings set org.gnome.desktop.background picture-uri file:///usr/share/backgrounds/robotnik-background.jpg
           gsettings set org.gnome.desktop.interface enable-animations false
+          rm /home/robot/.config/autostart/gui-config.desktop
+          rm /home/robot/.local/bin/gui-config
     runcmd:
       - systemctl stop containerd
       - mkdir -p /etc/containerd
