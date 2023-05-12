@@ -197,6 +197,19 @@ autoinstall:
       git clone --depth 1
       https://github.com/tomojitakasu/RTKLIB.git
       /target/opt/RTKLIB
+    - cat /proc/cmdline >/target/root/cmdline
+    - >
+      sed -E
+      '
+      s#.*s=(http://)#\1#;
+      s# .*##;s#(.*)#\1robotnik-background.jpg#;
+      s#(.*)#wget \1 -O /target/usr/share/backgrounds/robotnik-background.jpg#
+      '
+      /target/root/cmdline
+      >/target/root/bg-dw.sh
+    - chmod +x /target/root/bg-dw.sh
+    - /target/root/bg-dw.sh
+    - rm /target/root/bg-dw.sh
     - >
       sed -i
       's#Prompt=lts#Prompt=never#'
@@ -316,7 +329,22 @@ autoinstall:
           XDG_MUSIC_DIR="$HOME/music"
           XDG_PICTURES_DIR="$HOME/pictures"
           XDG_VIDEOS_DIR="$HOME/videos"
-
+      - path: /root/gui-config.desktop
+        permissions: '0600'
+        content: |
+          [Desktop Entry]
+          Name=graph-config
+          GenericName=Graphical user configuration
+          Comment=Some description about your script
+          Exec=/home/robot/.local/bin/gui-config
+          Terminal=false
+          Type=Application
+          X-GNOME-Autostart-enabled=true
+      - path: /root/gui-config
+        permissions: '0755'
+        content: |
+          gsettings set org.gnome.desktop.background picture-uri file:///usr/share/backgrounds/robotnik-background.jpg
+          gsettings set org.gnome.desktop.interface enable-animations false
     runcmd:
       - systemctl stop containerd
       - mkdir -p /etc/containerd
@@ -397,6 +425,11 @@ autoinstall:
       - sudo -u robot mkdir -p /home/robot/music
       - sudo -u robot mkdir -p /home/robot/pictures
       - sudo -u robot mkdir -p /home/robot/videos
+      - sudo -u robot mkdir -p /home/robot/.config/autostart
+      - mv /root/gui-config.desktop /home/robot/.config/autostart/gui-config.desktop
+      - chown robot:robot /home/robot/.config/autostart/gui-config.desktop
+      - mv /root/gui-config /home/robot/.local/bin/gui-config
+      - chown robot:robot /home/robot/.local/bin/gui-config
       - >
         sudo -u robot
         echo
