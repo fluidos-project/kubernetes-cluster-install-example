@@ -404,11 +404,14 @@ autoinstall:
         sudo -u robot
         gsettings set org.gnome.desktop.interface enable-animations false
       - snap stop --disable canonical-livepatch
+      - netplan apply
       - mv /root/.enable-vnc.sh /home/robot/.local/bin/vnc-enable
       - chown robot:robot /home/robot/.local/bin/vnc-enable
       - >
         sudo -u robot
         /home/robot/.local/bin/vnc-enable
+      - >
+        sudo -u robot
         echo "yes" >> /home/ubuntu/.config/gnome-initial-setup-done
       - systemctl set-default graphical
       - reboot
