@@ -74,7 +74,6 @@ autoinstall:
     - jq
     - powerline
     - fonts-powerline
-    # - fzf
     - ack-grep
     - net-tools
     - containerd.io
@@ -99,7 +98,6 @@ autoinstall:
     - ros-noetic-control-toolbox
     - ros-noetic-cmake-modules
     - ros-noetic-serial
-    # - ros-noetic-joystick-drivers
     - ros-noetic-rosbridge-server
     - ros-noetic-robot-localization
     - ros-noetic-twist-mux
@@ -109,7 +107,6 @@ autoinstall:
     - ros-noetic-ackermann*
     - ros-noetic-rosbridge-suite
     - ros-noetic-urg-node
-    # - ros-noetic-ar-track-alvar*
     - ros-noetic-move-base
     - ros-noetic-amcl
     - ros-noetic-libuvc-camera
