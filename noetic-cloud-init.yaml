@@ -258,6 +258,19 @@ autoinstall:
           setenv LD_LIBRARY_PATH echo $CMAKE_PREFIX_PATH | awk '{split($1, a, ":"); print a[1];}'"/lib":/opt/ros/melodic/lib:/opt/ros/melodic/lib/x86_64-linux-gnu
           zombie kr
           verbose on
+      - path: /root/.enable-vnc.sh
+        permissions: '0755'
+        content: |
+          #!/bin/bash
+          dconf write /org/gnome/desktop/remote-access/enabled true
+          dconf write /org/gnome/desktop/remote-access/prompt-enabled false
+          dconf write /org/gnome/desktop/remote-access/authentication-methods "['vnc']"
+          dconf write /org/gnome/desktop/remote-access/view_only false
+          dconf write /org/gnome/desktop/remote-access/require-encryption false
+          dconf write /org/gnome/desktop/remote-access/vnc-password \"\'UjBiMHRuMUs=\'\"
+          eth0_uuid=$(nmcli --get-values connection.uuid c show "netplan-eth0")
+          eth1_uudi=$(nmcli --get-values connection.uuid c show "netplan-eth1")
+          dconf write /org/gnome/settings-daemon/plugins/sharing/vino-server/enabled-connections "['${eth0_uuid}', '${eth1_uudi}']"
       - path: /root/user-dirs.dirs
         permissions: '0600'
         content: |
@@ -386,5 +399,10 @@ autoinstall:
         sudo -u robot
         gsettings set org.gnome.desktop.interface enable-animations false
       - snap stop --disable canonical-livepatch
+      - mv /root/.enable-vnc.sh /home/robot/.local/bin/vnc-enable
+      - chown robot:robot /home/robot/.local/bin/vnc-enable
+      - >
+        sudo -u robot
+        /home/robot/.local/bin/vnc-enable
         echo "yes" >> /home/ubuntu/.config/gnome-initial-setup-done
       - reboot
