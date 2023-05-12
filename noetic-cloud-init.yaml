@@ -178,6 +178,9 @@ autoinstall:
       cd /target/root &&
       tar -xzf peak-linux-driver-8.16.0.tar.gz &&
       rm peak-linux-driver-8.16.0.tar.gz
+      curtin in-target --target=/target --
+      systemctl set-default multi-user
+  shutdown: poweroff
   user-data:
     write_files:
       - path: /etc/udev/rules.d/46-pcan.rules
@@ -405,4 +408,5 @@ autoinstall:
         sudo -u robot
         /home/robot/.local/bin/vnc-enable
         echo "yes" >> /home/ubuntu/.config/gnome-initial-setup-done
+      - systemctl set-default graphical
       - reboot
