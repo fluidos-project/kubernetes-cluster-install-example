@@ -180,11 +180,6 @@ autoinstall:
       rm peak-linux-driver-8.16.0.tar.gz
   user-data:
     write_files:
-      # - path: /etc/modules-load.d/k8s.conf
-      #   permissions: '0644'
-      #   content: |
-      #     overlay
-      #     br_netfilter
       - path: /etc/udev/rules.d/46-pcan.rules
         permissions: '0644'
         content: |
