@@ -410,11 +410,8 @@ autoinstall:
       - python3 -m pip install six==1.13.0
       - python3 -m pip install evdev==0.8.1
       - python3 -m pip install ds4drv
-      - >
-        sudo -u robot
-        git clone --depth 1
-        https://github.com/junegunn/fzf.git
-        /home/robot/.fzf
+      - mv /root/fzf /home/robot/.fzf
+      - chown robot:robot -R /home/robot/.fzf
       - sudo -u robot /home/robot/.fzf/install --all
       - sudo -u robot mkdir -p /home/robot/.config
       - mv /root/user-dirs.dirs /home/robot/.config/user-dirs.dirs
