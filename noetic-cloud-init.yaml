@@ -178,6 +178,8 @@ autoinstall:
       cd /target/root &&
       tar -xzf peak-linux-driver-8.16.0.tar.gz &&
       rm peak-linux-driver-8.16.0.tar.gz
+    - sed -i 's#Prompt=lts#Prompt=never#' /target/etc/update-manager/release-upgrades
+    - >
       curtin in-target --target=/target --
       systemctl set-default multi-user
   shutdown: poweroff
