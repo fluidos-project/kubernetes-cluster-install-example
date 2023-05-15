@@ -3,3 +3,10 @@ ubuntu_distro="focal"
 iso_base_url="https://releases.ubuntu.com"
 shasum_file=SHA256SUMS
 distro_type="live-server"
+cloud_init_server_prot="http"
+cloud_init_server_name="192.168.20.165"
+cloud_init_server_port="3003"
+cloud_init_server_folder="edge"
+cloud_init_server_path=""
+kernel_cmdline_additional_params_permanent="net.ifnames=0 biosdevname=0"
+kernel_cmdline_additional_params_livecd='autoinstall ip=dhcp ds=nocloud-net\;s=${cloud_init_server_path}'
