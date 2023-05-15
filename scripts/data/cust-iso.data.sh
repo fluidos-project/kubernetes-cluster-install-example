@@ -63,3 +63,5 @@ cloud_init_server_path_first=''
 cloud_init_server_path_no_folder='${cloud_init_server_path_first}'
 cloud_init_server_path_folder='${cloud_init_server_path_first}${cloud_init_server_folder}/'
 cloud_init_server_path=''
+
+new_iso_name='${iso_name/.iso/}_autoinstall.iso'

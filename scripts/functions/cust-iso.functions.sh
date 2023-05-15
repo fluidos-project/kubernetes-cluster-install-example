@@ -171,6 +171,12 @@ function modify_iso() {
 }
 
 function create_new_iso() {
+  eval new_iso_name="${new_iso_name}"
+  print_info "${nfo_str_create_iso}"
+  if ! eval ${create_new_image_command}; then
+    print_error "${err_str_create_iso}"
+  fi
+  print_success "${suc_str_create_iso}"
   return 0
 }
 
@@ -188,7 +194,6 @@ function customize_iso() {
   if ! modify_iso; then
     return 1
   fi
-  return 0
   if ! create_new_iso; then
     return 1
   fi

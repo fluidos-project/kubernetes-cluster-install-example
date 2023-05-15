@@ -45,3 +45,14 @@ replace_md5sum_line_command_template='sed -i \"s#${old_md5sum}#${new_md5sum}#\" 
 create_nocloud_files_command='mkdir -p ${custom_iso_folder}/nocloud && touch ${custom_iso_folder}/nocloud/{meta-data,vendor-data}'
 copy_cloud_init_file_command='cp ${cloud_init_file} ${custom_iso_folder}/nocloud/user-data'
 clean_ghost_folder_command='rm -rf ${custom_iso_folder}/[BOOT\]/'
+create_new_image_command='xorriso -as mkisofs -r -V Ubuntu\ custom\ amd64 -o ${new_iso_name} -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin  ${custom_iso_folder}/boot ${custom_iso_folder}'
+# xorriso -as mkisofs -r \
+#   -V Ubuntu\ custom\ amd64 \
+#   -o ${new_iso_name} \
+#   -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot \
+#   -boot-load-size 4 -boot-info-table \
+#   -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \
+#   -isohybrid-gpt-basdat -isohybrid-apm-hfsplus \
+#   -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin  \
+#   ${custom_iso_folder}/boot ${custom_iso_folder}\
+# '
