@@ -32,6 +32,19 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 function prepare_custom_iso_params() {
+  if [[ "${cloud_init_embedded_file}" == "true" ]]; then
+    eval "kernel_cmdline_additional_params_livecd=${kernel_cmdline_additional_params_livecd_embedded}"
+  else
+    if ! prepare_custom_iso_params_web; then
+      return 1
+    fi
+      eval "kernel_cmdline_additional_params_livecd=${kernel_cmdline_additional_params_livecd_web}"
+  fi
+  echo "${kernel_cmdline_additional_params_livecd}"
+
+}
+
+function prepare_custom_iso_params_web() {
   if [[ -n "${cloud_init_server_port}" ]]; then
     cloud_init_server_path_first="${cloud_init_server_path_port}"
   else
@@ -76,6 +89,7 @@ function customize_iso() {
   if ! prepare_custom_iso_params; then
     return 1
   fi
+  return 0
   if ! extract_iso; then
     return 1
   fi

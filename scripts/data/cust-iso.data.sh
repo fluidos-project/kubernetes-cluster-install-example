@@ -42,8 +42,9 @@ iso_cust_file_lobk="${custom_iso_folder}/boot/grub/loopback.cfg"
 kernel_cmdline_additional_params_permanent="net.ifnames=0 biosdevname=0"
 kernel_cmdline_additional_params_livecd_web='autoinstall\ ip=dhcp\ ds=nocloud-net\\\;s=${cloud_init_server_path}'
 
-kernel_cmdline_additional_params_livecd_embedded='autoinstall ds=nocloud-net\\\;s=/cdrom/nocloud/'
+kernel_cmdline_additional_params_livecd_embedded='autoinstall\ ds=nocloud-net\\\;s=/cdrom/nocloud/'
 
+kernel_cmdline_additional_params_livecd=''
 
 cloud_init_server_path_no_port='${cloud_init_server_prot}://${cloud_init_server_name}/'
 cloud_init_server_path_port='${cloud_init_server_prot}://${cloud_init_server_name}:${cloud_init_server_port}/'
