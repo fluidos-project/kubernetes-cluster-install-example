@@ -37,4 +37,4 @@ get_iso_name_command='awk \"/${distro_type}/ {print \\\$2}\" ${shasum_file} | se
 download_iso_command='wget ${iso_name_full} -O ${iso_name}'
 verify_iso_command='sha256sum -c --ignore-missing ${shasum_file}'
 
-extract_iso_command='7z x -y ${iso_name}  -o${custom_iso_folder}'
+extract_iso_command='rm -rf ${custom_iso_folder} && 7z x -y ${iso_name}  -o${custom_iso_folder}'

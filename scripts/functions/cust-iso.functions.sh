@@ -36,6 +36,12 @@ function prepare_custom_iso_params() {
 }
 
 function extract_iso() {
+  print_info "${nfo_str_extract_iso}"
+  if ! eval "${extract_iso_command}"; then
+    print_error "${err_str_extract_iso}"
+    return 1
+  fi
+  print_success "${suc_str_extract_iso}"
   return 0
 }
 
