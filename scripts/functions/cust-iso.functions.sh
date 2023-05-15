@@ -135,23 +135,31 @@ function embbed_nocloud_config_file() {
   if [[ "${cloud_init_embedded_file}" != "true" ]]; then
     return 0
   fi
-  set -x
+  print_info "${nfo_str_nocloud_embedd}"
   if ! eval "${create_nocloud_files_command}"; then
-
+    print_error "${err_str_nocloud_embedd}"
     return 1
   fi
   if ! eval "${copy_cloud_init_file_command}"; then
+   print_error "${err_str_nocloud_embedd}"
     return 1
   fi
+  print_success "${suc_str_nocloud_embedd}"
   return 0
 }
 
+function clean_ghost_folder() {
+  return 0
+}
 
 function modify_iso() {
   if ! modify_kernel_cmdline_files; then
     return 1
   fi
   if ! embbed_nocloud_config_file; then
+    return 1
+  fi
+  if ! clean_ghost_folder; then
     return 1
   fi
   return 0

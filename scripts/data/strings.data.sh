@@ -72,3 +72,7 @@ err_str_mod_boot_file='Failed to patch ${boot_file}'
 nfo_str_md5sum_path='Changing md5sum of ${boot_file}'
 suc_str_md5sum_path='Updated md5sum of ${boot_file}'
 err_str_md5sum_path='Failed to update md5sum ${boot_file}'
+
+nfo_str_nocloud_embedd='Enmbedding into the iso the no-cloud configuration'
+suc_str_nocloud_embedd='No cloud configuration embedded from ${cloud_init_file}'
+err_str_nocloud_embedd='Failed to embed ${cloud_init_file}'
