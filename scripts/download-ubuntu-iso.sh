@@ -219,7 +219,7 @@ function get_iso() {
   return 0
 }
 
-function main() {
+function main_download_iso() {
   # if ! check_root_permission; then
   #   return 1
   # fi
@@ -246,5 +246,5 @@ done
 
 cd "${previous_exec_path}"
 
-main "${@}"
+main_download_iso "${@}"
 exit $?
