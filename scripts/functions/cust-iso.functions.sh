@@ -32,6 +32,21 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 function prepare_custom_iso_params() {
+  if [[ -n "${cloud_init_server_port}" ]]; then
+    cloud_init_server_path_first="${cloud_init_server_path_port}"
+  else
+    cloud_init_server_path_first="${cloud_init_server_path_no_port}"
+  fi
+  eval "cloud_init_server_path_first=${cloud_init_server_path_first}"
+  if [[ -n "${cloud_init_server_folder}" ]]; then
+    cloud_init_server_path="${cloud_init_server_path_folder}"
+  else
+    cloud_init_server_path="${cloud_init_server_path_no_folder}"
+  fi
+  eval "cloud_init_server_path=${cloud_init_server_path}"
+  eval "kernel_cmdline_additional_params_livecd_web=${kernel_cmdline_additional_params_livecd_web}"
+  echo "${cloud_init_server_path}"
+  echo "${kernel_cmdline_additional_params_livecd_web}"
   return 0
 }
 
@@ -42,10 +57,6 @@ function extract_iso() {
     return 1
   fi
   print_success "${suc_str_extract_iso}"
-  return 0
-}
-
-function mount_iso() {
   return 0
 }
 
@@ -68,9 +79,6 @@ function customize_iso() {
   if ! extract_iso; then
     return 1
   fi
-  if ! mount_iso; then
-    return 1
-  fi
   if ! modify_iso; then
     return 1
   fi
@@ -87,9 +95,9 @@ function main_customize_iso(){
   if ! tools_check "${cust_iso_tool_list[@]}"; then
     return 1
   fi
-  if ! main_download_iso; then
-    return 1
-  fi
+  # if ! main_download_iso; then
+  #   return 1
+  # fi
   if ! customize_iso; then
     return 0
   fi

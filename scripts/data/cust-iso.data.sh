@@ -34,4 +34,20 @@ cust_iso_tool_list=(\
   7z \
 )
 
-custom_iso_folder=cust_iso
+custom_iso_folder="cust_iso"
+iso_cust_file_grub="${custom_iso_folder}/boot/grub/grub.cfg"
+iso_cust_file_txt="${custom_iso_folder}/cust_iso/isolinux/txt.cfg"
+iso_cust_file_lobk="${custom_iso_folder}/boot/grub/loopback.cfg"
+
+kernel_cmdline_additional_params_permanent="net.ifnames=0 biosdevname=0"
+kernel_cmdline_additional_params_livecd_web='autoinstall\ ip=dhcp\ ds=nocloud-net\\\;s=${cloud_init_server_path}'
+
+kernel_cmdline_additional_params_livecd_embedded='autoinstall ds=nocloud-net\\\;s=/cdrom/nocloud/'
+
+
+cloud_init_server_path_no_port='${cloud_init_server_prot}://${cloud_init_server_name}/'
+cloud_init_server_path_port='${cloud_init_server_prot}://${cloud_init_server_name}:${cloud_init_server_port}/'
+cloud_init_server_path_first=''
+cloud_init_server_path_no_folder='${cloud_init_server_path_first}'
+cloud_init_server_path_folder='${cloud_init_server_path_first}${cloud_init_server_folder}/'
+cloud_init_server_path=''
