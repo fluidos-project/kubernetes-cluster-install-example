@@ -36,7 +36,7 @@ data_files=(\
   general.data.sh \
   strings.data.sh \
   commands.data.sh \
-  down-iso.data.sh
+  down-iso.data.sh \
 	../iso-params \
 
 )
