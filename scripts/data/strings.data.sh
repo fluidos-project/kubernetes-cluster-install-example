@@ -64,3 +64,11 @@ err_str_extract_iso='extraction of ${iso_name} in ${custom_iso_folder} failed'
 nfo_str_kernel_cmdline='Generating kernel cmdline additional arguments'
 suc_str_kernel_cmdline='Generated kernel arguments ${kernel_cmdline_additional_params}'
 err_str_kernel_cmdline='Failed to generate kernel arguments ${kernel_cmdline_additional_params}'
+
+nfo_str_mod_boot_file='Modifing boot-file ${boot_file}'
+suc_str_mod_boot_file='${boot_file} patched with additional kernel boot comands'
+err_str_mod_boot_file='Failed to patch ${boot_file}'
+
+nfo_str_md5sum_path='Changing md5sum of ${boot_file}'
+suc_str_md5sum_path='Updated md5sum of ${boot_file}'
+err_str_md5sum_path='Failed to update md5sum ${boot_file}'

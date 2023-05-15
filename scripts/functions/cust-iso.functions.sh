@@ -75,17 +75,56 @@ function extract_iso() {
   return 0
 }
 
-function modify_kernel_cmdline_file() {
-  echo "${boot_file}"
-  if ! eval ${kernel_cmdline_mod_command}; then
+function get_file_md5sum_file_entry() {
+  eval "get_old_md5sum_line_command=\"${get_old_md5sum_line_command_template}\""
+  old_md5sum=$(eval "${get_old_md5sum_line_command}")
+  return 0
+}
+function obtain_new_md5sum_file() {
+  eval "get_new_md5sum_line_command=\"${get_new_md5sum_line_command_template}\""
+  new_md5sum=$(eval "${get_new_md5sum_line_command}")
+  return 0
+}
+function modify_md5sum_file() {
+  eval "replace_md5sum_line_command=\"${replace_md5sum_line_command_template}\""
+  eval "${replace_md5sum_line_command}"
+  return 0
+}
+
+function modify_file_md5sum() {
+  print_info "${nfo_str_md5sum_path}"
+  if ! get_file_md5sum_file_entry; then
+    print_error "${err_str_md5sum_path}"
     return 1
   fi
+  if ! obtain_new_md5sum_file; then
+    print_error "${err_str_md5sum_path}"
+    return 1
+  fi
+  if ! modify_md5sum_file; then
+    print_error "${err_str_md5sum_path}"
+    return 1
+  fi
+  print_success "${suc_str_md5sum_path}"
+  return 0
+}
+
+function modify_kernel_cmdline_file() {
+  print_info "${nfo_str_mod_boot_file}"
+  if ! eval ${kernel_cmdline_mod_command}; then
+    print_error "${err_str_mod_boot_file}"
+    return 1
+  fi
+  print_success "${suc_str_mod_boot_file}"
   return 0
 }
 
 function modify_kernel_cmdline_files() {
   for boot_file in "${boot_files[@]}"; do
     if ! modify_kernel_cmdline_file; then
+      return 1
+    fi
+    if ! modify_file_md5sum; then
       return 1
     fi
   done
@@ -122,13 +161,13 @@ function customize_iso() {
   if ! prepare_custom_iso_params; then
     return 1
   fi
-  return 0
   if ! extract_iso; then
     return 1
   fi
   if ! modify_iso; then
     return 1
   fi
+  return 0
   if ! create_new_iso; then
     return 1
   fi
@@ -142,9 +181,9 @@ function main_customize_iso(){
   if ! tools_check "${cust_iso_tool_list[@]}"; then
     return 1
   fi
-  # if ! main_download_iso; then
-  #   return 1
-  # fi
+  if ! main_download_iso; then
+    return 1
+  fi
   if ! customize_iso; then
     return 0
   fi

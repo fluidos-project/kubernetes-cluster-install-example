@@ -39,3 +39,6 @@ verify_iso_command='sha256sum -c --ignore-missing ${shasum_file}'
 
 extract_iso_command='rm -rf ${custom_iso_folder} && 7z x -y ${iso_name}  -o${custom_iso_folder}'
 kernel_cmdline_mod_command='sed -i "s#---#${kernel_cmdline_additional_params}#" ${boot_file}'
+get_old_md5sum_line_command_template='grep .${boot_file#${custom_iso_folder}} ${iso_md5sum_file}'
+get_new_md5sum_line_command_template='md5sum ${boot_file} | sed "s#${boot_file}#.${boot_file#${custom_iso_folder}}#"'
+replace_md5sum_line_command_template='sed -i \"s#${old_md5sum}#${new_md5sum}#\" ${iso_md5sum_file}'

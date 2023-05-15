@@ -34,9 +34,11 @@ cust_iso_tool_list=(\
   7z \
   sed \
   md5sum \
+  grep \
 )
 
 custom_iso_folder="cust_iso"
+iso_md5sum_file="${custom_iso_folder}/md5sum.txt"
 iso_cust_file_grub="${custom_iso_folder}/boot/grub/grub.cfg"
 iso_cust_file_txt="${custom_iso_folder}/isolinux/txt.cfg"
 iso_cust_file_lobk="${custom_iso_folder}/boot/grub/loopback.cfg"
