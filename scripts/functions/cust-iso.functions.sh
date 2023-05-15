@@ -31,8 +31,47 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+function prepare_custom_iso_params() {
+  return 0
+}
+
+function extract_iso() {
+  return 0
+}
+
+function mount_iso() {
+  return 0
+}
+
+function modify_iso() {
+  return 0
+}
+
+function create_new_iso() {
+  return 0
+}
+
+function clean_system() {
+  return 0
+}
+
 function customize_iso() {
-  if ! main_download_iso; then
+  if ! prepare_custom_iso_params; then
+    return 1
+  fi
+  if ! extract_iso; then
+    return 1
+  fi
+  if ! mount_iso; then
+    return 1
+  fi
+  if ! modify_iso; then
+    return 1
+  fi
+  if ! create_new_iso; then
+    return 1
+  fi
+  if clean_system; then
     return 1
   fi
   return 0
@@ -40,6 +79,9 @@ function customize_iso() {
 
 function main_customize_iso(){
   if ! tools_check "${cust_iso_tool_list[@]}"; then
+    return 1
+  fi
+  if ! main_download_iso; then
     return 1
   fi
   if ! customize_iso; then
