@@ -31,10 +31,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 cust_iso_tool_list=(\
-  grep \
-  wget \
-  awk \
-  sha256sum \
-  sed \
+  7z \
 )
 
+custom_iso_folder=cust_iso

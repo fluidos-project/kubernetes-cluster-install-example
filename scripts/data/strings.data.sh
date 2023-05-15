@@ -56,3 +56,7 @@ err_str_dl_iso='could not downloag ${iso_name_full}'
 nfo_str_ver_iso='Verifiying ${iso_name}'
 suc_str_ver_iso='${iso_name} is verified'
 err_str_ver_iso='${iso_name} is corruped'
+
+nfo_str_extract_iso='extracting ${iso_name}'
+suc_str_extract_iso='${iso_name} is extracted on ${custom_iso_folder}'
+err_str_extract_iso='extraction of ${iso_name} in ${custom_iso_folder} failed'

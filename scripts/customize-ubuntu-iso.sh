@@ -31,69 +31,70 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-tool_list=(\
-  grep \
-  wget \
-  awk \
-  sha256sum \
-  sed \
-  p7zip-full \
-)
-
-data_dir=""
+data_dir="data"
 data_files=(\
-	iso-params \
+  general.data.sh \
+  strings.data.sh \
+  commands.data.sh \
+  down-iso.data.sh \
+  cust-iso.data.sh \
+  ../iso-params \
+
 )
 
 data_files_fp=(\
 )
 
-func_dir=""
+func_dir="functions"
 func_files=(\
-  download-ubuntu-iso.sh \
+  general.functions.sh \
+  down-iso.functions.sh \
+  cust-iso.functions.sh \
 )
 
-funct_files_fp=(\
+func_files_fp=(\
 )
 
-function check_root_permission() {
-  if [[ "${EUID}" = 0 ]]; then
-    return 0
-  else
-    print_error "${err_str_root_permission}"
-    return 1
-  fi
-}
-
-
-
-function customize_iso() {
-    if ! download_iso; then
-      return 1
-    fi
-  fi
-  if ! change_iso; then
+function test_file() {
+  local file="${1}"
+  if ! test -r "${file}"; then
+    echo "File not present: ${file} : Aborting" 2>&1
     return 1
   fi
   return 0
 }
 
-function main() {
-  # if ! check_root_permission; then
-  #   return 1
-  # fi
-  if ! tools_check "${tool_list[@]}"; then
-    return 1
-  fi
-  if ! customize_iso; then
-    return 0
-  fi
+function prepare_files() {
+  previous_exec_path="$PWD"
+  host_source_path="$(dirname "$(readlink -f "${0}")")"
+  for data_file in "${data_files[@]}"; do
+    data_file="${host_source_path}/${data_dir}/${data_file}"
+    if ! test_file "${data_file}"; then
+      return 1
+    fi
+    data_files_fp=(\
+      "${data_files_fp[@]}" \
+      "${data_file}" \
+    )
+  done
+
+  for func_file in "${func_files[@]}"; do
+    func_file="${host_source_path}/${func_dir}/${func_file}"
+    if ! test_file "${func_file}"; then
+      return 1
+    fi
+    func_files_fp=(\
+      "${func_files_fp[@]}" \
+      "${func_file}" \
+    )
+  done
+  cd "$host_source_path"
   return 0
 }
 
 if ! prepare_files; then
-	cd "${previous_exec_path}"
-	exit 1
+  cd "${previous_exec_path}"
+  exit 1
 fi
 
 for data_file in "${data_files_fp[@]}"; do
@@ -103,14 +104,14 @@ for data_file in "${data_files_fp[@]}"; do
   fi
 done
 
-for data_file in "${data_files_fp[@]}"; do
-	if ! source "${data_file}"; then
-		echo "Could not load: ${data_file} : Aborting" 2>&1
-		exit 1
-	fi
+for func_file in "${func_files_fp[@]}"; do
+  if ! source "${func_file}"; then
+    echo "Could not load: ${func_file} : Aborting" 2>&1
+    exit 1
+  fi
 done
 
 cd "${previous_exec_path}"
 
-main "${@}"
+main_customize_iso "${@}"
 exit $?
