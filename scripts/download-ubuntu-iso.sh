@@ -56,6 +56,10 @@ data_files=(\
 data_files_fp=(\
 )
 
+# 0 -> iso verified
+# 1 -> iso not verified
+iso_verifed=1
+
 shasum_url='${iso_base_url}/${ubuntu_distro}/${shasum_file}'
 iso_name_full='${iso_base_url}/${ubuntu_distro}/${iso_name}'
 
@@ -77,6 +81,11 @@ err_str_shasum_download='could not retrieve ${shasum_url}'
 nfo_str_get_iso_name="Getting iso name"
 suc_str_get_iso_name='Iso to download ${iso_name_full}'
 err_str_get_iso_name='could not retrieve iso name'
+
+nfo_str_ck_local_iso='Checkig is ${iso_name} already present on machine'
+suc_str_ck_local_iso='${iso_name} Downloaded'
+err_str_ck_local_iso='No local image found'
+
 
 nfo_str_dl_iso='Downloading ${iso_name_full}'
 suc_str_dl_iso='${iso_name} Downloaded'
@@ -182,7 +191,24 @@ function get_iso_name() {
 	return 0
 }
 
+function is_iso_already_downloaded() {
+  print_info "${nfo_str_ck_local_iso}"
+  if ! [[ -r "${iso_name}" ]]; then
+    print_info "${err_str_ck_local_iso}"
+    return 1
+  fi
+  print_success "${suc_str_ck_local_iso}"
+  if ! verify_iso; then
+    return 1
+  fi
+  iso_verifed=0
+  return 0
+}
+
 function download_iso() {
+  if is_iso_already_downloaded; then
+    return 0
+  fi
   print_info "${nfo_str_dl_iso}"
   if ! eval "${download_iso_command}"; then
     print_error "${err_str_dl_iso}"
@@ -193,6 +219,9 @@ function download_iso() {
 }
 
 function verify_iso() {
+  if [[ "${iso_verifed}" -eq 0 ]]; then
+    return 0
+  fi
 	print_info "${nfo_str_ver_iso}"
   if ! eval "${verify_iso_command}"; then
     print_error "${err_str_ver_iso}"
