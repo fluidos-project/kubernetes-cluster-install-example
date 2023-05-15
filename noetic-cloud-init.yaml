@@ -44,7 +44,6 @@ autoinstall:
   network:
     network:
       version: 2
-      # renderer: NetworkManager
       ethernets:
         eth0:
           dhcp4: yes
@@ -199,17 +198,21 @@ autoinstall:
       /target/opt/RTKLIB
     - cat /proc/cmdline >/target/root/cmdline
     - >
-      sed -E
-      '
-      s#.*s=(http://)#\1#;
-      s# .*##;s#(.*)#\1robotnik-background.jpg#;
-      s#(.*)#wget \1 -O /target/usr/share/backgrounds/robotnik-background.jpg#
-      '
-      /target/root/cmdline
-      >/target/root/bg-dw.sh
-    - chmod +x /target/root/bg-dw.sh
-    - /target/root/bg-dw.sh
-    - rm /target/root/bg-dw.sh
+      wget
+      https://raw.githubusercontent.com/RobotnikAutomation/robotnik_assets/main/robotnik-background.jpg
+      -O /target/usr/share/backgrounds/robotnik-background.jpg
+    # - >
+    #   sed -E
+    #   '
+    #   s#.*s=(http://)#\1#;
+    #   s# .*##;s#(.*)#\1robotnik-background.jpg#;
+    #   s#(.*)#wget \1 -O /target/usr/share/backgrounds/robotnik-background.jpg#
+    #   '
+    #   /target/root/cmdline
+    #   >/target/root/bg-dw.sh
+    # - chmod +x /target/root/bg-dw.sh
+    # - /target/root/bg-dw.sh
+    # - rm /target/root/bg-dw.sh
     - >
       sed -i
       's#Prompt=lts#Prompt=never#'
