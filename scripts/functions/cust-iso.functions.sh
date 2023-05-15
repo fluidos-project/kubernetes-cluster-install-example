@@ -75,7 +75,17 @@ function extract_iso() {
   return 0
 }
 
-function modify_kernel_cmdline() {
+function modify_kernel_cmdline_file() {
+  echo "${boot_file}"
+  return 0
+}
+
+function modify_kernel_cmdline_files() {
+  for boot_file in "${boot_files[@]}"; do
+    if ! modify_kernel_cmdline_file; then
+      return 1
+    fi
+  done
   return 0
 }
 
@@ -88,6 +98,12 @@ function embbed_nocloud_config_file() {
 
 
 function modify_iso() {
+  if ! modify_kernel_cmdline_files; then
+    return 1
+  fi
+  if ! embbed_nocloud_config_file; then
+    return 1
+  fi
   return 0
 }
 
