@@ -42,3 +42,5 @@ kernel_cmdline_mod_command='sed -i "s#---#${kernel_cmdline_additional_params}#" 
 get_old_md5sum_line_command_template='grep .${boot_file#${custom_iso_folder}} ${iso_md5sum_file}'
 get_new_md5sum_line_command_template='md5sum ${boot_file} | sed "s#${boot_file}#.${boot_file#${custom_iso_folder}}#"'
 replace_md5sum_line_command_template='sed -i \"s#${old_md5sum}#${new_md5sum}#\" ${iso_md5sum_file}'
+create_nocloud_files_command='mkdir -p ${custom_iso_folder}/nocloud && touch ${custom_iso_folder}/nocloud/{meta-data,vendor-data}'
+copy_cloud_init_file_command='cp ${cloud_init_file} ${custom_iso_folder}/nocloud/user-data'

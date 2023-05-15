@@ -135,6 +135,14 @@ function embbed_nocloud_config_file() {
   if [[ "${cloud_init_embedded_file}" != "true" ]]; then
     return 0
   fi
+  set -x
+  if ! eval "${create_nocloud_files_command}"; then
+
+    return 1
+  fi
+  if ! eval "${copy_cloud_init_file_command}"; then
+    return 1
+  fi
   return 0
 }
 
