@@ -131,6 +131,21 @@ function modify_kernel_cmdline_files() {
   return 0
 }
 
+function add_md5sum_checksum() {
+  eval "inject_md5sum_line_command=\"${inject_md5sum_line_command_template}\""
+  eval "${inject_md5sum_line_command}"
+  return 0
+}
+
+function add_md5sum_checksums_for_nocloud() {
+  for file in "${nocloud_files[@]}"; do
+    if ! add_md5sum_checksum; then
+      return 1
+    fi
+  done
+  return 0
+}
+
 function embbed_nocloud_config_file() {
   if [[ "${cloud_init_embedded_file}" != "true" ]]; then
     return 0
@@ -142,6 +157,10 @@ function embbed_nocloud_config_file() {
   fi
   if ! eval "${copy_cloud_init_file_command}"; then
    print_error "${err_str_nocloud_embedd}"
+    return 1
+  fi
+  if ! eval add_md5sum_checksums_for_nocloud; then
+    print_error "${err_str_nocloud_embedd}"
     return 1
   fi
   print_success "${suc_str_nocloud_embedd}"
@@ -181,6 +200,11 @@ function create_new_iso() {
 }
 
 function clean_system() {
+  print_info "${nfo_str_clean_system}"
+  if ! eval ${clean_system_command}; then
+    print_error "${err_str_clean_system}"
+  fi
+  print_success "${suc_str_clean_system}"
   return 0
 }
 

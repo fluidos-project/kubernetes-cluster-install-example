@@ -43,10 +43,20 @@ iso_cust_file_grub="${custom_iso_folder}/boot/grub/grub.cfg"
 iso_cust_file_txt="${custom_iso_folder}/isolinux/txt.cfg"
 iso_cust_file_lobk="${custom_iso_folder}/boot/grub/loopback.cfg"
 
+nocloud_vendor="${custom_iso_folder}/nocloud/vendor-data"
+nocloud_user="${custom_iso_folder}/nocloud/user-data"
+nocloud_meta="${custom_iso_folder}/nocloud/meta-data"
+
 boot_files=(\
   "${iso_cust_file_grub}" \
   "${iso_cust_file_txt}" \
   "${iso_cust_file_lobk}" \
+)
+
+nocloud_files=(\
+  "${nocloud_vendor}" \
+  "${nocloud_user}" \
+  "${nocloud_meta}" \
 )
 
 kernel_cmdline_additional_params_permanent="net.ifnames=0 biosdevname=0"

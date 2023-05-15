@@ -84,3 +84,7 @@ err_str_ghost_clean='Failed to clean ghost folder'
 nfo_str_create_iso='Creating new iso ${new_iso_name}'
 suc_str_create_iso='${new_iso_name} created'
 err_str_create_iso='Error creating ${new_iso_name}'
+
+nfo_str_clean_system='Cleaning system'
+suc_str_clean_system='${custom_iso_folder} removed'
+err_str_clean_system='Error creating cleaning system'
