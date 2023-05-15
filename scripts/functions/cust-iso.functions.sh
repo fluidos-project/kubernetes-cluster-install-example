@@ -77,6 +77,9 @@ function extract_iso() {
 
 function modify_kernel_cmdline_file() {
   echo "${boot_file}"
+  if ! eval ${kernel_cmdline_mod_command}; then
+    return 1
+  fi
   return 0
 }
 
