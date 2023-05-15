@@ -232,6 +232,16 @@ function main_download_iso() {
   return 0
 }
 
+
+# check_if_script_is_sourced
+script_name=$( basename "${0#-}" ) #- needed if sourced no path
+this_script=$( basename "${BASH_SOURCE}" )
+if ! [[ "${script_name}" == "${this_script}" ]] ; then
+  # sourced
+  echo "sourced"
+  return 0
+fi
+
 if ! prepare_files; then
 	cd "${previous_exec_path}"
 	exit 1
