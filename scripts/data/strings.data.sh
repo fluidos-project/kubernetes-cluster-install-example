@@ -81,6 +81,8 @@ nfo_str_ghost_clean='Cleaning ghost folders'
 suc_str_ghost_clean='Ghost folder cleaned'
 err_str_ghost_clean='Failed to clean ghost folder'
 
+err_str_fix_hwe='Failed to fix hwe package'
+
 nfo_str_create_iso='Creating new iso ${new_iso_name}'
 suc_str_create_iso='${new_iso_name} created'
 err_str_create_iso='Error creating ${new_iso_name}'

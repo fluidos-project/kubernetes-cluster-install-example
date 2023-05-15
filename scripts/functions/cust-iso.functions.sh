@@ -171,8 +171,17 @@ function clean_ghost_folder() {
   print_info "${nfo_str_ghost_clean}"
   if ! eval ${clean_ghost_folder_command}; then
     print_error "${err_str_ghost_clean}"
+    return 1
   fi
   print_success "${suc_str_ghost_clean}"
+  return 0
+}
+
+function correct_hwe_failure() {
+  if ! eval ${correct_hwe_failure_command}; then
+    print_error "${err_str_fix_hwe}"
+    return 1
+  fi
   return 0
 }
 
@@ -184,6 +193,9 @@ function modify_iso() {
     return 1
   fi
   if ! clean_ghost_folder; then
+    return 1
+  fi
+  if ! correct_hwe_failure; then
     return 1
   fi
   return 0

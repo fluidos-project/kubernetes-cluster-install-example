@@ -47,6 +47,7 @@ copy_cloud_init_file_command='cp ${cloud_init_file} ${custom_iso_folder}/nocloud
 clean_ghost_folder_command='rm -rf ${custom_iso_folder}/[BOOT\]/'
 create_new_image_command='xorriso -as mkisofs -r -V Ubuntu\ custom\ amd64 -o ${new_iso_name} -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin  ${custom_iso_folder}/boot ${custom_iso_folder}'
 inject_md5sum_line_command_template='md5sum ${file} | sed "s#${file}#.${file#${custom_iso_folder}}#" >>${iso_md5sum_file}'
+correct_hwe_failure_command='test -r ${custom_iso_folder}/pool/main/l/linux-hwe-5.15/linux-modules-extra-5.15.0-67-generic_5.15.0-67.74~20.04.1_am.deb && mv ${custom_iso_folder}/pool/main/l/linux-hwe-5.15/linux-modules-extra-5.15.0-67-generic_5.15.0-67.74~20.04.1_am.deb ${custom_iso_folder}/pool/main/l/linux-hwe-5.15/linux-modules-extra-5.15.0-67-generic_5.15.0-67.74~20.04.1_amd64.deb || true'
 clean_system_command='rm -rf ${custom_iso_folder}'
 # xorriso -as mkisofs -r \
 #   -V Ubuntu\ custom\ amd64 \
