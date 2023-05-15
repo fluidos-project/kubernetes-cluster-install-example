@@ -60,3 +60,7 @@ err_str_ver_iso='${iso_name} is corruped'
 nfo_str_extract_iso='extracting ${iso_name}'
 suc_str_extract_iso='${iso_name} is extracted on ${custom_iso_folder}'
 err_str_extract_iso='extraction of ${iso_name} in ${custom_iso_folder} failed'
+
+nfo_str_kernel_cmdline='Generating kernel cmdline additional arguments'
+suc_str_kernel_cmdline='Generated kernel arguments ${kernel_cmdline_additional_params}'
+err_str_kernel_cmdline='Failed to generate kernel arguments ${kernel_cmdline_additional_params}'

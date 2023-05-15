@@ -32,15 +32,19 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 function prepare_custom_iso_params() {
+  print_info "${nfo_str_kernel_cmdline}"
   if [[ "${cloud_init_embedded_file}" == "true" ]]; then
-    eval "kernel_cmdline_additional_params_livecd=${kernel_cmdline_additional_params_livecd_embedded}"
+    eval kernel_cmdline_additional_params_livecd="${kernel_cmdline_additional_params_livecd_embedded}"
   else
     if ! prepare_custom_iso_params_web; then
+      print_error "${err_str_kernel_cmdline}"
       return 1
     fi
-      eval "kernel_cmdline_additional_params_livecd=${kernel_cmdline_additional_params_livecd_web}"
+      eval kernel_cmdline_additional_params_livecd="${kernel_cmdline_additional_params_livecd_web}"
   fi
-  echo "${kernel_cmdline_additional_params_livecd}"
+  eval kernel_cmdline_additional_params="${kernel_cmdline_additional_params}"
+  print_success "${suc_str_kernel_cmdline}"
+  return 0
 
 }
 
@@ -56,10 +60,8 @@ function prepare_custom_iso_params_web() {
   else
     cloud_init_server_path="${cloud_init_server_path_no_folder}"
   fi
-  eval "cloud_init_server_path=${cloud_init_server_path}"
-  eval "kernel_cmdline_additional_params_livecd_web=${kernel_cmdline_additional_params_livecd_web}"
-  echo "${cloud_init_server_path}"
-  echo "${kernel_cmdline_additional_params_livecd_web}"
+  eval cloud_init_server_path="${cloud_init_server_path}"
+  eval kernel_cmdline_additional_params_livecd_web="${kernel_cmdline_additional_params_livecd_web}"
   return 0
 }
 
@@ -72,6 +74,18 @@ function extract_iso() {
   print_success "${suc_str_extract_iso}"
   return 0
 }
+
+function modify_kernel_cmdline() {
+  return 0
+}
+
+function embbed_nocloud_config_file() {
+  if [[ "${cloud_init_embedded_file}" != "true" ]]; then
+    return 0
+  fi
+  return 0
+}
+
 
 function modify_iso() {
   return 0
