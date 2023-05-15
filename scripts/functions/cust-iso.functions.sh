@@ -149,6 +149,11 @@ function embbed_nocloud_config_file() {
 }
 
 function clean_ghost_folder() {
+  print_info "${nfo_str_ghost_clean}"
+  if ! eval ${clean_ghost_folder_command}; then
+    print_error "${err_str_ghost_clean}"
+  fi
+  print_success "${suc_str_ghost_clean}"
   return 0
 }
 

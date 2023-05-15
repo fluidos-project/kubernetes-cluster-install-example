@@ -76,3 +76,7 @@ err_str_md5sum_path='Failed to update md5sum ${boot_file}'
 nfo_str_nocloud_embedd='Enmbedding into the iso the no-cloud configuration'
 suc_str_nocloud_embedd='No cloud configuration embedded from ${cloud_init_file}'
 err_str_nocloud_embedd='Failed to embed ${cloud_init_file}'
+
+nfo_str_ghost_clean='Cleaning ghost folders'
+suc_str_ghost_clean='Ghost folder cleaned'
+err_str_ghost_clean='Failed to clean ghost folder'
