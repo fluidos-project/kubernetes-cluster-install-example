@@ -7,5 +7,5 @@ cloud_init_server_prot="http"
 cloud_init_server_name="192.168.20.165"
 cloud_init_server_port="3003"
 cloud_init_server_folder="edge"
-cloud_init_embedded_file=false
+cloud_init_embedded_file=true
 cloud_init_file="../noetic-cloud-init.yaml"
