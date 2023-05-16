@@ -271,6 +271,10 @@ function cust_iso_parse_arguments() {
       --embedded | -e)
         cloud_init_embedded_file=true
         ;;
+      --ci-file | -f)
+        cloud_init_file="${2}"
+        shift
+        ;;
       --ci-server-prot | -t)
         cloud_init_server_prot="${2}"
         shift
@@ -283,7 +287,7 @@ function cust_iso_parse_arguments() {
         cloud_init_server_port="${2}"
         shift
         ;;
-      --ci-server-folder | -f)
+      --ci-server-folder | -d)
         cloud_init_server_folder="${2}"
         shift
         ;;
@@ -322,11 +326,12 @@ Optional arguments:
  -e, --embedded                      Select to embedded the nocloud file
                                      inside the iso
                                      (This will invalide the ci* options)
+ -f, --ci-file [FILE]                cloud-init file path
  -t, --ci-server-prot [PROTOCOL]     Cloud-init server protocol
                                      (https/http)
  -n, --ci-server-name [URL]          Cloud-init server url
  -p, --ci-server-port [PORT]         Cloud-init server port (default 80/443)
- -f, --ci-server-folder [FOLDER]     Cloud-init server folder
+ -d, --ci-server-folder [FOLDER]     Cloud-init server folder
 
  -h, --help                Shows this help
 
