@@ -1,19 +1,6 @@
-# Kubernetes install
+# Noetic installation
 
-Installing kubernetes cluster (single node) with the following:
-- ubuntu 22.04 server
-- kubeadm
-- kubectl
-- kubelet
-- helm
-- k9s
-
-Inside kubernetes:
-- Kube-vip (for multimaster)
-- Metric-server
-- Flannel or (calico)
-- Metallb
-- liqo
+Full unattantendded installation ros noetic with graphical capabilites
 
 ## Cloud Init setup
 ```bash
