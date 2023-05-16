@@ -5,7 +5,7 @@ Full unattantendded installation ros noetic with graphical capabilites
 ## Cloud Init setup
 ```bash
 git clone git@github.com:RobotnikAutomation/kubernetes-install.git
-checkout devel
+checkout noetic-devel
 cd kubernetes-install
 ```
 
@@ -18,6 +18,8 @@ cd kubernetes-install
 cd www/
 python3 -m http.server 3003
 ```
+
+**NOTE:** not required for embedded cloud-init files inside the iso
 
 ## Method 1: grub edit
 
@@ -35,6 +37,9 @@ python3 -m http.server 3003
 8. Wait till cloud init runs all the first boot commands
 
 ## Method 2: script
+
+**NOTE:** This method will allow to embed the cloud-init file
+
 edit the following `script/iso-params` file or use the argument parser
 
 ```bash
