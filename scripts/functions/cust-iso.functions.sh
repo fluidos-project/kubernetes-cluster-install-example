@@ -240,6 +240,9 @@ function customize_iso() {
 }
 
 function main_customize_iso(){
+  if ! cust_iso_parse_arguments "${@}"; then
+    return 1
+  fi
   if ! tools_check "${cust_iso_tool_list[@]}"; then
     return 1
   fi
@@ -250,4 +253,96 @@ function main_customize_iso(){
     return 0
   fi
   return 0
+}
+
+
+function cust_iso_parse_arguments() {
+  local key=""
+  while [[ $# -gt 0 ]]; do
+    key="${1}"
+    case "${key}" in
+      --distro|-d)
+        ubuntu_distro="${2}"
+        shift
+        ;;
+      --net | -s)
+        cloud_init_embedded_file=false
+        ;;
+      --embedded | -e)
+        cloud_init_embedded_file=true
+        ;;
+      --ci-server-prot | -t)
+        cloud_init_server_prot="${2}"
+        shift
+        ;;
+      --ci-server-name | -n)
+        cloud_init_server_name="${2}"
+        shift
+        ;;
+      --ci-server-port | -p)
+        cloud_init_server_port="${2}"
+        shift
+        ;;
+      --ci-server-folder | -f)
+        cloud_init_server_folder="${2}"
+        shift
+        ;;
+      --help|-h)
+        cust_iso_help
+        exit 0
+        ;;
+      --version|-v)
+        cust_iso_version
+        exit 0
+        ;;
+      *)
+        cust_iso_help
+        exit 0
+        ;;
+    esac
+    shift
+  done
+  return 0
+}
+
+function cust_iso_help() {
+cat << EOF
+Automated ubuntu installation creator
+Version: ${version}
+
+Usage:
+${0}
+${0} [OPTIONS]
+
+Optional arguments:
+ -d, --distro [DISTRO]               Select ubuntu distro (focal/jammy)
+                                     (focal/jammy)
+ -s, --net                           Select to use the cloud-init
+                                     server
+ -e, --embedded                      Select to embedded the nocloud file
+                                     inside the iso
+                                     (This will invalide the ci* options)
+ -t, --ci-server-prot [PROTOCOL]     Cloud-init server protocol
+                                     (https/http)
+ -n, --ci-server-name [URL]          Cloud-init server url
+ -p, --ci-server-port [PORT]         Cloud-init server port (default 80/443)
+ -f, --ci-server-folder [FOLDER]     Cloud-init server folder
+
+ -h, --help                Shows this help
+
+ -v, --version             Shows the version of the script
+
+EOF
+  return 0
+}
+
+function cust_iso_version() {
+cat << EOF
+${0} (Automated ubuntu installation creator): ${version}
+
+Copyright (C) 2023 Robotnik Automation S.L.
+License BSD-3: BSD 3-clause license <https://opensource.org/licenses/BSD-3-Clause>.
+
+Written by Guillem Gari.
+EOF
 }

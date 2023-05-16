@@ -31,6 +31,8 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+version="1.0.0"
+
 data_dir="data"
 data_files=(\
   general.data.sh \
