@@ -350,6 +350,158 @@ autoinstall:
           gsettings set org.gnome.desktop.interface enable-animations false || exit 1
           rm /home/robot/.config/autostart/gui-config.desktop || exit 1
           rm /home/robot/.local/bin/gui-config || exit 1
+      - path: /etc/systemd/system/fake-hdmi.service
+        permissions: '0644'
+        content: |
+          [Unit]
+          Description=Fake HDMI PLUG
+          After=network-online.target
+          Before=display-manager.service
+
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/local/sbin/hdmi-faker
+
+          [Install]
+          WantedBy=default.target
+      - path: /usr/local/sbin/hdmi-faker
+        permissions: '0755'
+        content: |
+          #!/bin/bash
+          # Description:   HDMI monitor faker
+          # Company:       Robotnik Automation S.L.
+          # Creation Year: 2023
+          # Author:        Guillem Gari <ggari@robotnik.es>
+          #
+          #
+          # Copyright (c) 2023, Robotnik Automation S.L.
+          # All rights reserved.
+          #
+          # Redistribution and use in source and binary forms, with or without
+          # modification, are permitted provided that the following conditions are met:
+          #     * Redistributions of source code must retain the above copyright
+          #       notice, this list of conditions and the following disclaimer.
+          #     * Redistributions in binary form must reproduce the above copyright
+          #       notice, this list of conditions and the following disclaimer in the
+          #       documentation and/or other materials provided with the distribution.
+          #     * Neither the name of the Robotnik Automation S.L.L. nor the
+          #       names of its contributors may be used to endorse or promote products
+          #       derived from this software without specific prior written permission.
+          #
+          # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+          # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+          # THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+          # PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Robotnik Automation S.L.L.
+          # BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+          # OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+          # PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+          # OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+          # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+          # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+          # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+          graphic_card_num="0"
+          display_device="HDMI-A-1"
+          device="/sys/kernel/debug/dri/${graphic_card_num}/${display_device}/force"
+
+          function force_off() {
+              if ! /bin/echo off > "${device}"; then
+                  return 1
+              fi
+              return 0
+          }
+
+          function force_on() {
+              if ! /bin/echo on > "${device}"; then
+                  return 1
+              fi
+              return 0
+          }
+
+          function find_device() {
+              echo "searching $device"
+              for i in $(seq 2 150); do
+                  if test -e "${device}"; then
+                      echo "$device found"
+                      return 0
+                  fi
+                  sleep 2
+              done
+              echo "$device not found"
+              return 1
+          }
+
+          function fake_hdmi() {
+              if ! force_off; then
+                  return 1
+              fi
+              sleep 3
+              if ! force_on; then
+                  return 1
+              fi
+              return 0
+          }
+
+          function main() {
+              if ! find_device; then
+                  return 1
+              fi
+              if ! fake_hdmi; then
+                  return 1
+              fi
+              return 0
+          }
+
+          main ${@}
+          exit $?
+      - path: /root/virtual-monitor
+        permissions: '0755'
+        content: |
+          #!/bin/bash
+          [[ -z $DISPLAY ]] && { echo "no display"; exit 0; }
+          connec=HDMI-1
+          /usr/bin/xrandr -d $DISPLAY --output $connec --primary --auto
+
+          modes=(\
+          "1920 1080 60" \
+          "1920 1000 60" \
+          "1920 980 60" \
+          "1920 900 60" \
+          "1920 800 60" \
+          "1680 1050 60" \
+          "1680 1000 60" \
+          "1680 900 60" \
+          "1680 800 60" \
+          "1600 900 60" \
+          "1440 900 60" \
+          "1280 800 60" \
+          "1152 864 60" \
+          "1280 720 60" \
+          "1024 768 60" \
+          )
+
+          for mode in "${modes[@]}"; do
+            modeline=$(cvt ${mode} | tail -n 1 | cut -d ' ' -f 2-)
+            echo "$modeline"
+            modeline_name=$(echo ${modeline} | cut -d '"' -f 2)
+            eval "/usr/bin/xrandr --newmode ${modeline}"
+            eval "/usr/bin/xrandr --addmode ${connec} ${modeline_name}"
+          done
+          /usr/bin/xrandr
+          /usr/bin/xrandr -s 1920x1080
+      - path: /root/virtual-resize.desktop
+        permissions: '0644'
+        content: |
+          [Desktop Entry]
+          Type=Application
+          Exec=/home/robot/.local/bin/virtual-monitor
+          Hidden=false
+          NoDisplay=false
+          X-GNOME-Autostart-enabled=true
+          Name[en_US]=Virtual-monitor-resizer
+          Name=Virtual-monitor-resizer
+          Comment[en_US]=Virtual monitor resize to 1920x1080
+          Comment=Virtual monitor resize to 1920x1080
     runcmd:
       - systemctl stop containerd
       - mkdir -p /etc/containerd
@@ -435,6 +587,11 @@ autoinstall:
       - chown robot:robot /home/robot/.config/autostart/gui-config.desktop
       - mv /root/gui-config /home/robot/.local/bin/gui-config
       - chown robot:robot /home/robot/.local/bin/gui-config
+      - mv /root/virtual-monitor /home/robot/.local/bin/virtual-monitor
+      - chown robot:robot /home/robot/.local/bin/virtual-monitor
+      - mv /root/virtual-resize.desktop home/robot/.config/autostart/virtual-resize.desktop
+      - chown robot:robot home/robot/.config/autostart/virtual-resize.desktop
+      - systemctl enable fake-hdmi.service
       - >
         sudo -u robot
         echo
