@@ -164,6 +164,30 @@ autoinstall:
     - rm /target/root/rustdesk.deb
     - >
       wget
+      https://github.com/RobotnikAutomation/robotnik_assets/raw/main/vnc/turbovnc_3.0.3_amd64.deb
+      -O /target/root/turbovnc.deb
+    - >
+      curtin in-target --target=/target --
+      apt install -y /root/turbovnc.deb
+    - rm /target/root/turbovnc.deb
+    - >
+      wget
+      https://github.com/RobotnikAutomation/robotnik_assets/raw/main/vnc/virtualgl_3.1_amd64.deb
+      -O /target/root/virtualgl.deb
+    - >
+      curtin in-target --target=/target --
+      apt install -y /root/virtualgl.deb
+    - rm /target/root/virtualgl.deb
+    - >
+      wget
+      https://github.com/RobotnikAutomation/robotnik_assets/raw/main/vnc/tigervncserver_1.13.1-1ubuntu1_amd64.deb
+      -O /target/root/tigervncserver.deb
+    - >
+      curtin in-target --target=/target --
+      apt install -y /root/tigervncserver.deb
+    - rm /target/root/tigervncserver.deb
+    - >
+      wget
       https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
       -O /target/root/install_geographiclib_datasets.sh
     - chmod +x /target/root/install_geographiclib_datasets.sh
@@ -553,6 +577,7 @@ autoinstall:
         cmake --build . --target install &&
         rm -rf /root/EIPScanner-1.3.0
       - hostnamectl set-chassis vm
+      - /opt/VirtualGL/bin/vglserver_config +glx +s +f
       - mv /root/screenrc /home/robot/.screenrc
       - chown robot:robot /home/robot/.screenrc
       - >
