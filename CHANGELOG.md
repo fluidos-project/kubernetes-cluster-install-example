@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added 
 - Hdmi software dummy
+- Added tigervnc
+- Added turbovnc
+- Added virtualgl
 
 ## [noetic-0.9.0] - 2023-05-16
 
