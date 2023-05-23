@@ -277,6 +277,12 @@ autoinstall:
         permissions: '0644'
         content: |
           KERNEL=="js[0-9]*", SUBSYSTEM=="input", ATTRS{name}=="Wireless Controller", SYMLINK+="input/js_base"
+      - path: /etc/apt/apt.conf.d/10periodic
+        permissions: '0644'
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Download-Upgradeable-Packages "0";
+          APT::Periodic::AutocleanInterval "0";
       - path: /etc/apt/apt.conf.d/20auto-upgrades
         permissions: '0644'
         content: |
