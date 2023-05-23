@@ -379,7 +379,7 @@ autoinstall:
           gsettings set org.gnome.desktop.background picture-uri file:///usr/share/backgrounds/robotnik-background.jpg || exit 1
           gsettings set org.gnome.desktop.interface enable-animations false || exit 1
           rm /home/robot/.config/autostart/gui-config.desktop || exit 1
-          rm /home/robot/.local/bin/gui-config || exit 1
+          echo "rm $HOME/.local/bin/gui-config" > $HOME/.local/bin/gui-config || exit 1
       - path: /etc/systemd/system/fake-hdmi.service
         permissions: '0644'
         content: |
