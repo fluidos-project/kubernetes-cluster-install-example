@@ -40,13 +40,25 @@ python3 -m http.server 3003
 
 **NOTE:** This method will allow to embed the cloud-init file
 
-edit the following `script/iso-params` file or use the argument parser
-
 configure your system
 ```bash
 # from the repository base directory
 sudo apt install p7zip-full xorriso isolinux
 mkdir -p iso
+```
+
+edit the following `script/iso-params` file or use the argument parser
+
+if you want to use the the web cloud-init file change the following keys on the `script/iso-params`:
+
+```bash
+cloud_init_server_prot="http"
+#change it to your ip
+cloud_init_server_name="192.168.20.165"
+cloud_init_server_port="3003"
+cloud_init_server_folder="edge"
+# Changed it to false
+cloud_init_embedded_file=false
 ```
 
 Use the settings from the file `script/iso-params`
