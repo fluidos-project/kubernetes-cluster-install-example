@@ -42,11 +42,20 @@ python3 -m http.server 3003
 
 edit the following `script/iso-params` file or use the argument parser
 
+configure your system
 ```bash
+# from the repository base directory
+sudo apt install p7zip-full xorriso isolinux
+mkdir -p iso
+```
 
+Use the settings from the file `script/iso-params`
+```bash
+cd iso
 ../scripts/customize-ubuntu-iso.sh
 ```
 
+Or change it from your needs
 ```bash
 ../scripts/customize-ubuntu-iso.sh --help
 
@@ -77,6 +86,14 @@ Optional arguments:
  -v, --version             Shows the version of the script
 
 ```
+
+You should get an additional ISO image with suffix `_autoinstall.iso`
+
+As an example for `ubuntu-20.04.6-live-server-amd64.iso` you will get:
+`ubuntu-20.04.6-live-server-amd64_autoinstall.iso`
+
+And that the ISO you will need to use.
+
 ### Installation
 1. Burn the image on a pendrive
 2. Run the cloud init http server on the remote machine
