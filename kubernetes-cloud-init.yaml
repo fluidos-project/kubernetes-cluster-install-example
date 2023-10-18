@@ -29,10 +29,15 @@ autoinstall:
         source: >
           deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
         keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+      # kubernetes.list:
+      #   source: >
+      #     deb [arch=amd64] https://apt.kubernetes.io/ kubernetes-xenial main
+      #   keyid: A362B822F6DEDC652817EA46B53DC80D13EDEF05
       kubernetes.list:
         source: >
-          deb [arch=amd64] https://apt.kubernetes.io/ kubernetes-xenial main
-        keyid: A362B822F6DEDC652817EA46B53DC80D13EDEF05
+          deb [arch=amd64] https://pkgs.k8s.io/core:/stable:/v1.26/deb/ /
+        keyid: DE15B14486CD377B9E876E1A234654DA9A296436
+
   network:
     network:
       version: 2
@@ -63,9 +68,9 @@ autoinstall:
     - docker-ce-cli
     - docker-compose-plugin
     # kube tools package order matters (version specific)
-    - kubelet=1.26.4-00
-    - kubectl=1.26.4-00
-    - kubeadm=1.26.4-00
+    - kubelet
+    - kubectl
+    - kubeadm
   late-commands:
     - sed -i 's#^/swap.img#\#/swap.img#' /target/etc/fstab
     - >
