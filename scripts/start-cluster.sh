@@ -97,6 +97,15 @@ if [[ ${CNI_FLAVOR} == "calico" ]]; then
   rm custom-resources.yaml.1 custom-resources.yaml.2
   kubectl create -f custom-resources.yaml || exit 1
 fi
+if [[ ${CNI_FLAVOR} == "weave" ]]; then
+  sudo curl -L git.io/weave -o /usr/local/bin/weave || exit 1
+  sudo chmod a+x /usr/local/bin/weave || exit 1
+  wget https://github.com/weaveworks/weave/releases/download/v${WEAVE_VERSION}/weave-daemonset-k8s.yaml -O weave-daemonset-k8s.yaml || exit 1
+  yq e -i '.items[5].spec.template.spec.containers[0].env += [{"name": "IPALLOC_RANGE", "value": env(CIDR_NET) }]' weave-daemonset-k8s.yaml || exit 1
+  kubectl apply -f weave-daemonset-k8s.yaml || exit 1
+  rm weave-daemonset-k8s.yaml || exit 1
+fi
+
 kubectl get -n kube-system daemonsets.apps kube-proxy -o yaml >kube-proxy-ds.yaml
 yq -i '.spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms += [{ "matchExpressions" : [{"key": "liqo.io/type", "operator" : "NotIn", "values": [ "virtual-node"]}] }]' kube-proxy-ds.yaml
 kubectl delete -n kube-system daemonsets.apps kube-proxy
@@ -133,24 +142,24 @@ EOF
 metallb_replicas=0
 echo "Waiting for metallb to start up"
 while [ $metallb_replicas -lt 1 ]; do
-	metallb_replicas=0
-	replicas=$(kubectl get deployments.apps --namespace metallb-system metallb-controller -o json | jq -r ".status.readyReplicas")
-	if [[ $replicas =~ [0-9]+ ]]; then
-		metallb_replicas=$replicas
-	fi
-	if [ $metallb_replicas -ge 1 ]; then
-		echo "\nMetallb is up"
-		sleep 2
-		echo "applying metallb configuration"
-		if kubectl apply -f metallb-config.yaml; then
-			break;
-		else
-			echo "retry metallb configuration apply"
-		fi
-	else
-		echo -n "."
-		sleep 5
-	fi
+  metallb_replicas=0
+  replicas=$(kubectl get deployments.apps --namespace metallb-system metallb-controller -o json | jq -r ".status.readyReplicas")
+  if [[ $replicas =~ [0-9]+ ]]; then
+    metallb_replicas=$replicas
+  fi
+  if [ $metallb_replicas -ge 1 ]; then
+    echo "\nMetallb is up"
+    sleep 2
+    echo "applying metallb configuration"
+    if kubectl apply -f metallb-config.yaml; then
+      break;
+    else
+      echo "retry metallb configuration apply"
+    fi
+  else
+    echo -n "."
+    sleep 5
+  fi
 done
 liqoctl install kubeadm --cluster-name $CLUSTER_NAME || exit 1
 LIQO_SVC_PROTO=$(kubectl get services -n liqo liqo-gateway -o yaml \
