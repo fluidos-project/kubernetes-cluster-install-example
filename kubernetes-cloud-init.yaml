@@ -7,6 +7,8 @@ autoinstall:
     username: edge
     password: $6$0/CRYJLMihw/N/Ad$LodWk0RHv3HxQDdDj7tdunz2Cdq2kVYFei.q0/6FmOqRi/bcQGfbTpizVFJsb.iB49FVFgtxGLw.RgVbXooB9.
   refresh-installer:
+  # interactive-sections:
+  #   - storage
   update: yes
   locale: en_US
   keyboard:
@@ -383,7 +385,8 @@ autoinstall:
           export USE_VIP=true
           export CNI_FLAVOR=flannel
           export CALICO_VERSION=3.25.1
-          export FLANNEL_VERSION=0.21.4
+          export FLANNEL_VERSION=0.22.3
+          export WEAVE_VERSION=2.8.1
           export METALLB_IP_POD="192.168.2.211-192.168.2.219"
           export CLUSTER_NAME=rob-cluster-00
       - path: /root/destroy-cluster.sh
@@ -394,6 +397,8 @@ autoinstall:
             /etc/cni/net.d/calico-kubeconfig \
             /etc/cni/net.d/10-flannel.conflist
           sudo kubeadm reset --force
+          sudo ifconfig cni0 dow
+          sudo ip link delete cni0
       - path: /root/start-cluster.sh
         permissions: '0755'
         content: |
@@ -496,6 +501,15 @@ autoinstall:
             rm custom-resources.yaml.1 custom-resources.yaml.2
             kubectl create -f custom-resources.yaml || exit 1
           fi
+          if [[ ${CNI_FLAVOR} == "weave" ]]; then
+            sudo curl -L git.io/weave -o /usr/local/bin/weave || exit 1
+            sudo chmod a+x /usr/local/bin/weave || exit 1
+            wget https://github.com/weaveworks/weave/releases/download/v${WEAVE_VERSION}/weave-daemonset-k8s.yaml -O weave-daemonset-k8s.yaml || exit 1
+            yq e -i '.items[5].spec.template.spec.containers[0].env += [{"name": "IPALLOC_RANGE", "value": env(CIDR_NET) }]' weave-daemonset-k8s.yaml || exit 1
+            kubectl apply -f weave-daemonset-k8s.yaml || exit 1
+            rm weave-daemonset-k8s.yaml || exit 1
+          fi
+
           kubectl get -n kube-system daemonsets.apps kube-proxy -o yaml >kube-proxy-ds.yaml
           yq -i '.spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms += [{ "matchExpressions" : [{"key": "liqo.io/type", "operator" : "NotIn", "values": [ "virtual-node"]}] }]' kube-proxy-ds.yaml
           kubectl delete -n kube-system daemonsets.apps kube-proxy
@@ -562,6 +576,7 @@ autoinstall:
           )
           sudo ufw allow ${LIQO_SVC_PORT}/${LIQO_SVC_PROTO} || exit 1
           liqoctl generate peer-command
+
     runcmd:
       - systemctl stop containerd
       - mkdir -p /etc/containerd
@@ -597,3 +612,4 @@ autoinstall:
         echo
         "source /usr/share/powerline/bindings/bash/powerline.sh"
         >>/home/edge/.bashrc
+      - poweroff
