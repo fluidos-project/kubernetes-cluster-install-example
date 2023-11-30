@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description:   download ubuntu server iso
+# Description:   General functions
 # Company:       Robotnik Automation S.L.
 # Creation Year: 2023
 # Author:        Guillem Gari <ggari@robotnik.es>
@@ -31,85 +31,48 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-data_dir="data"
-data_files=(\
-  general.data.sh \
-  strings.data.sh \
-  commands.data.sh \
-  down-iso.data.sh \
-	../iso-params \
-
-)
-
-data_files_fp=(\
-)
-
-func_dir="functions"
-func_files=(\
-  general.functions.sh \
-  down-iso.functions.sh \
-)
-
-func_files_fp=(\
-)
-
-function test_file() {
-	local file="${1}"
-	if ! test -r "${file}"; then
-		echo "File not present: ${file} : Aborting" 2>&1
-		return 1
-	fi
-	return 0
+function print_error() {
+  local message="${1}"
+  eval "echo -e "'"'"${err_colour}[ERROR]${no_colour}:   ${message}"'"'" 2>&1"
 }
 
-function prepare_files() {
-  previous_exec_path="$PWD"
-  host_source_path="$(dirname "$(readlink -f "${0}")")"
-  for data_file in "${data_files[@]}"; do
-    data_file="${host_source_path}/${data_dir}/${data_file}"
-    if ! test_file "${data_file}"; then
-      return 1
-    fi
-    data_files_fp=(\
-      "${data_files_fp[@]}" \
-      "${data_file}" \
-    )
-  done
+function print_info() {
+  local message="${1}"
+  eval "echo -e "'"'"${nfo_colour}[INFO]${no_colour}:    ${message}"'"'""
+}
 
-  for func_file in "${func_files[@]}"; do
-    func_file="${host_source_path}/${func_dir}/${func_file}"
-    if ! test_file "${func_file}"; then
+function print_success() {
+  local message="${1}"
+  eval "echo -e "'"'"${suc_colour}[SUCCESS]${no_colour}: ${message}"'"'""
+}
+
+function check_root_permission() {
+  if [[ "${EUID}" = 0 ]]; then
+    return 0
+  else
+    print_error "${err_str_root_permission}"
+    return 1
+  fi
+}
+
+function tool_check() {
+  local binary="${1}"
+  if [[ -z "${binary}" ]];then
+    return 1
+  fi
+  eval "${tool_check_cmd}"
+  return $?
+}
+
+function tools_check() {
+  local tools=("${@}")
+  print_info "${nfo_str_tool_checking}"
+  for tool in "${tools[@]}"; do
+    if ! tool_check "${tool}"; then
+      print_error "${err_str_required_tool_not_found}"
       return 1
     fi
-    func_files_fp=(\
-      "${func_files_fp[@]}" \
-      "${func_file}" \
-    )
   done
-  cd "$host_source_path"
+  print_success "${suc_str_tool_check_success}"
   return 0
 }
-
-if ! prepare_files; then
-	cd "${previous_exec_path}"
-	exit 1
-fi
-
-for data_file in "${data_files_fp[@]}"; do
-	if ! source "${data_file}"; then
-		echo "Could not load: ${data_file} : Aborting" 2>&1
-		exit 1
-	fi
-done
-
-for func_file in "${func_files_fp[@]}"; do
-  if ! source "${func_file}"; then
-    echo "Could not load: ${func_file} : Aborting" 2>&1
-    exit 1
-  fi
-done
-
-cd "${previous_exec_path}"
-
-main_download_iso "${@}"
-exit $?

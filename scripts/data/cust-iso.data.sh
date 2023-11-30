@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description:   download ubuntu server iso
+# Description:   customize iso data
 # Company:       Robotnik Automation S.L.
 # Creation Year: 2023
 # Author:        Guillem Gari <ggari@robotnik.es>
@@ -30,86 +30,48 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-data_dir="data"
-data_files=(\
-  general.data.sh \
-  strings.data.sh \
-  commands.data.sh \
-  down-iso.data.sh \
-	../iso-params \
-
+cust_iso_tool_list=(\
+  7z \
+  sed \
+  md5sum \
+  grep \
 )
 
-data_files_fp=(\
+custom_iso_folder="cust_iso"
+iso_md5sum_file="${custom_iso_folder}/md5sum.txt"
+iso_cust_file_grub="${custom_iso_folder}/boot/grub/grub.cfg"
+iso_cust_file_txt="${custom_iso_folder}/isolinux/txt.cfg"
+iso_cust_file_lobk="${custom_iso_folder}/boot/grub/loopback.cfg"
+
+nocloud_vendor="${custom_iso_folder}/nocloud/vendor-data"
+nocloud_user="${custom_iso_folder}/nocloud/user-data"
+nocloud_meta="${custom_iso_folder}/nocloud/meta-data"
+
+boot_files=(\
+  "${iso_cust_file_grub}" \
+  "${iso_cust_file_txt}" \
+  "${iso_cust_file_lobk}" \
 )
 
-func_dir="functions"
-func_files=(\
-  general.functions.sh \
-  down-iso.functions.sh \
+nocloud_files=(\
+  "${nocloud_vendor}" \
+  "${nocloud_user}" \
+  "${nocloud_meta}" \
 )
 
-func_files_fp=(\
-)
+kernel_cmdline_additional_params_permanent="net.ifnames=0 biosdevname=0"
+kernel_cmdline_additional_params_livecd_web='autoinstall\\\ ip=dhcp\\\ ds=nocloud-net\\\\\\\\\\\;s=${cloud_init_server_path}'
 
-function test_file() {
-	local file="${1}"
-	if ! test -r "${file}"; then
-		echo "File not present: ${file} : Aborting" 2>&1
-		return 1
-	fi
-	return 0
-}
+kernel_cmdline_additional_params_livecd_embedded='autoinstall\\\ ds=nocloud\\\\\\\;s=/cdrom/nocloud/'
 
-function prepare_files() {
-  previous_exec_path="$PWD"
-  host_source_path="$(dirname "$(readlink -f "${0}")")"
-  for data_file in "${data_files[@]}"; do
-    data_file="${host_source_path}/${data_dir}/${data_file}"
-    if ! test_file "${data_file}"; then
-      return 1
-    fi
-    data_files_fp=(\
-      "${data_files_fp[@]}" \
-      "${data_file}" \
-    )
-  done
+kernel_cmdline_additional_params_livecd=''
+kernel_cmdline_additional_params='${kernel_cmdline_additional_params_livecd}\ ---\ ${kernel_cmdline_additional_params_permanent}'
 
-  for func_file in "${func_files[@]}"; do
-    func_file="${host_source_path}/${func_dir}/${func_file}"
-    if ! test_file "${func_file}"; then
-      return 1
-    fi
-    func_files_fp=(\
-      "${func_files_fp[@]}" \
-      "${func_file}" \
-    )
-  done
-  cd "$host_source_path"
-  return 0
-}
+cloud_init_server_path_no_port='${cloud_init_server_prot}://${cloud_init_server_name}/'
+cloud_init_server_path_port='${cloud_init_server_prot}://${cloud_init_server_name}:${cloud_init_server_port}/'
+cloud_init_server_path_first=''
+cloud_init_server_path_no_folder='${cloud_init_server_path_first}'
+cloud_init_server_path_folder='${cloud_init_server_path_first}${cloud_init_server_folder}/'
+cloud_init_server_path=''
 
-if ! prepare_files; then
-	cd "${previous_exec_path}"
-	exit 1
-fi
-
-for data_file in "${data_files_fp[@]}"; do
-	if ! source "${data_file}"; then
-		echo "Could not load: ${data_file} : Aborting" 2>&1
-		exit 1
-	fi
-done
-
-for func_file in "${func_files_fp[@]}"; do
-  if ! source "${func_file}"; then
-    echo "Could not load: ${func_file} : Aborting" 2>&1
-    exit 1
-  fi
-done
-
-cd "${previous_exec_path}"
-
-main_download_iso "${@}"
-exit $?
+new_iso_name='${iso_name/.iso/}_autoinstall.iso'

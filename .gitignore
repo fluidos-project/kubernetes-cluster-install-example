@@ -1,3 +1,5 @@
 iso/livefs-editor/*
 !iso/livefs-editor/actions.yaml
 *.iso
+iso/SHA256SUMS
+iso/cust_iso/*

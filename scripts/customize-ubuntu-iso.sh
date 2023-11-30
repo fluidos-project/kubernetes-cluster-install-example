@@ -31,13 +31,16 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+version="1.0.0"
+
 data_dir="data"
 data_files=(\
   general.data.sh \
   strings.data.sh \
   commands.data.sh \
   down-iso.data.sh \
-	../iso-params \
+  cust-iso.data.sh \
+  ../iso-params \
 
 )
 
@@ -48,18 +51,19 @@ func_dir="functions"
 func_files=(\
   general.functions.sh \
   down-iso.functions.sh \
+  cust-iso.functions.sh \
 )
 
 func_files_fp=(\
 )
 
 function test_file() {
-	local file="${1}"
-	if ! test -r "${file}"; then
-		echo "File not present: ${file} : Aborting" 2>&1
-		return 1
-	fi
-	return 0
+  local file="${1}"
+  if ! test -r "${file}"; then
+    echo "File not present: ${file} : Aborting" 2>&1
+    return 1
+  fi
+  return 0
 }
 
 function prepare_files() {
@@ -91,15 +95,15 @@ function prepare_files() {
 }
 
 if ! prepare_files; then
-	cd "${previous_exec_path}"
-	exit 1
+  cd "${previous_exec_path}"
+  exit 1
 fi
 
 for data_file in "${data_files_fp[@]}"; do
-	if ! source "${data_file}"; then
-		echo "Could not load: ${data_file} : Aborting" 2>&1
-		exit 1
-	fi
+  if ! source "${data_file}"; then
+    echo "Could not load: ${data_file} : Aborting" 2>&1
+    exit 1
+  fi
 done
 
 for func_file in "${func_files_fp[@]}"; do
@@ -111,5 +115,5 @@ done
 
 cd "${previous_exec_path}"
 
-main_download_iso "${@}"
+main_customize_iso "${@}"
 exit $?

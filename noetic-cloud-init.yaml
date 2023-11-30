@@ -1,0 +1,652 @@
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    hostname: rob-robot-000
+    realname: Robotnik Automation S.L.
+    username: robot
+    password: $6$Z2ZFK3VplTxBlX2w$blmQ9Um05Z0FG8AfqH1A/C3fPSVR7C.2X1ev9IcTj.SIICC0zwdRBY2nZTYp.DK/i9wuaXEq4wspJTNkgAeBP0
+  refresh-installer:
+  update: yes
+  locale: en_US
+  keyboard:
+    layout: es
+    # variant: es
+  source:
+    id: "ubuntu-server"
+  ssh:
+    install-server: yes
+    authorized-keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtkQFf7sa+G1oAGkPC2fMR+qOqcE651SToEyVbR6aDFR9kYLSFLvzUA1W+hjDsI1uL5SuOQju1kDDDnNO0SjQOsffqw44L3D9CXqNPIAGs+6lBffDGd9A6e5yLpOuaXM5t9dMBq2SWV2Frq8gu0CR3NyHtFCzu87ghlKzaelaGWdIeyR+2HqtQr3t+ykCF5u0/+MLGWEHISpl+aV17+lvRB8qRNE0hZm7lSWTgJ2gRFVIGy69tsUCYf9+0KJDkM3sfvxzM2HyKNN60gkGDTH0BA4/ZTzqs8qbCylD1Jhgl+0ZNaIg6OkhyFBzESxrQpQkexOTtygtpv6YJM2liZTV7
+    allow-pw: yes
+  updates: all
+  apt:
+    mirror-selection:
+      primary:
+        - uri: http://archive.ubuntu.com/ubuntu
+    sources:
+      docker.list:
+        source: >
+          deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+      ros.list:
+        source: >
+          deb [arch=amd64] http://packages.ros.org/ros/ubuntu focal main
+        keyid: C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+      anydesk.list:
+        source: >
+          deb [arch=amd64] http://deb.anydesk.com/ all main
+        keyid: D56311E5FF3B6F39D5A16ABE18DF3741CDFFDE29
+      chrome.list:
+        source: >
+          deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main
+        keyid: EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796
+  network:
+    network:
+      version: 2
+      ethernets:
+        eth0:
+          dhcp4: yes
+          optional: yes
+        eth1:
+          dhcp4: yes
+          optional: true
+  storage:
+    layout:
+      name: lvm
+      match:
+        ssd: yes
+      sizing-policy: all
+  snaps:
+    - name: code
+      channel: stable
+      classic: true
+    - name: remmina
+      channel: stable
+      classic: false
+  packages:
+    - anydesk
+    - chromium-browser
+    - google-chrome-stable
+    - gnupg2
+    - apt-transport-https
+    - jq
+    - powerline
+    - fonts-powerline
+    - ack-grep
+    - net-tools
+    - containerd.io
+    - docker-ce
+    - docker-ce-cli
+    - docker-compose-plugin
+    - ubuntu-desktop-minimal
+    - screen
+    - python3-rosdep
+    - python3-rosinstall
+    - python3-rosinstall-generator
+    - build-essential
+    - python3-wstool
+    - ros-noetic-desktop-full
+    - ros-noetic-transmission-interface
+    - ros-noetic-effort-controllers
+    - ros-noetic-joint-state-controller
+    - ros-noetic-navigation
+    - ros-noetic-ros-control
+    - ros-noetic-ros-controllers
+    - ros-noetic-velocity-controllers
+    - ros-noetic-control-toolbox
+    - ros-noetic-cmake-modules
+    - ros-noetic-serial
+    - ros-noetic-rosbridge-server
+    - ros-noetic-robot-localization
+    - ros-noetic-twist-mux
+    - ros-noetic-imu-tools
+    - ros-noetic-mavros-*
+    - ros-noetic-teb-local-planner
+    - ros-noetic-ackermann*
+    - ros-noetic-rosbridge-suite
+    - ros-noetic-urg-node
+    - ros-noetic-move-base
+    - ros-noetic-amcl
+    - ros-noetic-libuvc-camera
+    - ros-noetic-realsense2-camera
+    - ros-noetic-rqt-joint-trajectory-controller
+    - ros-noetic-psen-scan*
+    - openssh-server
+    - vim
+    - subversion
+    - git
+    - apache2
+    - mingetty
+    - libpopt-dev
+    - sysstat
+    - ifstat
+    - ntpdate
+    - terminator
+    - screen
+    - libpcap-dev
+    - socat
+    - ffmpeg
+    - python-is-python3
+    - python3-pip
+    - python3-catkin-tools
+    - python3-bloom
+    - arp-scan
+    - libmodbus*
+    - net-tools
+    - meld
+    - libmysql++3v5
+    - libmysql++-dev
+    - vino
+    - gconf2
+  late-commands:
+    - >
+      wget
+      https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+      -O yq
+    - chmod +x yq
+    - mv yq /target/usr/local/bin/yq
+    - >
+      wget
+      https://download.teamviewer.com/download/linux/teamviewer_amd64.deb
+      -O /target/root/teamviewer_amd64.deb
+    - >
+      curtin in-target --target=/target --
+      apt install -y /root/teamviewer_amd64.deb
+    - rm /target/root/teamviewer_amd64.deb
+    - >
+      wget
+      https://github.com/rustdesk/rustdesk/releases/download/1.1.9/rustdesk-1.1.9.deb
+      -O /target/root/rustdesk.deb
+    - >
+      curtin in-target --target=/target --
+      apt install -y /root/rustdesk.deb
+    - rm /target/root/rustdesk.deb
+    - >
+      wget
+      https://github.com/RobotnikAutomation/robotnik_assets/raw/main/vnc/turbovnc_3.0.3_amd64.deb
+      -O /target/root/turbovnc.deb
+    - >
+      curtin in-target --target=/target --
+      apt install -y /root/turbovnc.deb
+    - rm /target/root/turbovnc.deb
+    - >
+      wget
+      https://github.com/RobotnikAutomation/robotnik_assets/raw/main/vnc/virtualgl_3.1_amd64.deb
+      -O /target/root/virtualgl.deb
+    - >
+      curtin in-target --target=/target --
+      apt install -y /root/virtualgl.deb
+    - rm /target/root/virtualgl.deb
+    - >
+      wget
+      https://github.com/RobotnikAutomation/robotnik_assets/raw/main/vnc/tigervncserver_1.13.1-1ubuntu1_amd64.deb
+      -O /target/root/tigervncserver.deb
+    - >
+      curtin in-target --target=/target --
+      apt install -y /root/tigervncserver.deb
+    - rm /target/root/tigervncserver.deb
+    - >
+      wget
+      https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
+      -O /target/root/install_geographiclib_datasets.sh
+    - chmod +x /target/root/install_geographiclib_datasets.sh
+    - >
+      curtin in-target --target=/target --
+      /root/install_geographiclib_datasets.sh
+    - rm /target/root/install_geographiclib_datasets.sh
+    - >
+      wget
+      http://www.peak-system.com/fileadmin/media/linux/files/peak-linux-driver-8.16.0.tar.gz
+      -O /target/root/peak-linux-driver-8.16.0.tar.gz
+    - >
+      cd /target/root &&
+      tar -xzf peak-linux-driver-8.16.0.tar.gz &&
+      rm peak-linux-driver-8.16.0.tar.gz
+    - >
+      wget
+      https://github.com/nimbuscontrols/EIPScanner/archive/refs/tags/1.3.0.tar.gz
+      -O /target/root/1.3.0.tar.gz &&
+      cd /target/root/ &&
+      tar -xaf 1.3.0.tar.gz &&
+      rm 1.3.0.tar.gz
+    - >
+      apt install git
+    - >
+      git clone --depth 1
+      https://github.com/junegunn/fzf.git
+      /target/root/fzf
+    - >
+      git clone --depth 1
+      https://github.com/tomojitakasu/RTKLIB.git
+      /target/opt/RTKLIB
+    - cat /proc/cmdline >/target/root/cmdline
+    - >
+      wget
+      https://raw.githubusercontent.com/RobotnikAutomation/robotnik_assets/main/robotnik-background.jpg
+      -O /target/usr/share/backgrounds/robotnik-background.jpg
+    # - >
+    #   sed -E
+    #   '
+    #   s#.*s=(http://)#\1#;
+    #   s# .*##;s#(.*)#\1robotnik-background.jpg#;
+    #   s#(.*)#wget \1 -O /target/usr/share/backgrounds/robotnik-background.jpg#
+    #   '
+    #   /target/root/cmdline
+    #   >/target/root/bg-dw.sh
+    # - chmod +x /target/root/bg-dw.sh
+    # - /target/root/bg-dw.sh
+    # - rm /target/root/bg-dw.sh
+    - >
+      sed -i
+      's#Prompt=lts#Prompt=never#'
+      /target/etc/update-manager/release-upgrades
+    - >
+      curtin in-target --target=/target --
+      systemctl set-default multi-user
+  shutdown: poweroff
+  user-data:
+    write_files:
+      - path: /etc/udev/rules.d/46-pcan.rules
+        permissions: '0644'
+        content: |
+          # # Single unit
+          KERNEL=="pcanusb*", SYMLINK+="pcan_base", MODE="0666"
+          # # Mutliple units
+          # KERNEL=="pcanusb*", ATTRS{devid}=="40",SYMLINK+="pcan_traction", MODE="0666"
+          # KERNEL=="pcanusb*", ATTRS{devid}=="30",SYMLINK+="pcan_steer", MODE="0666"
+      - path: /etc/udev/rules.d/37-bluetooth-hci.rules
+        permissions: '0644'
+        content: |
+          # SUBSYSTEM=="usb", ATTRS{idVendor}=="your-vendor-id-here", ATTRS{idProduct}=="your-product-id-here", ATTR{authorized}="0"
+
+      - path: /etc/udev/rules.d/50-imu.rules
+        permissions: '0644'
+        content: |
+          # KERNEL=="ttyUSB[0-9]*", ATTRS{idProduct}=="6001", ATTRS{serial}=="FT91CQPY", NAME="%k", SYMLINK="ttyUSB_IMU", GROUP="dialout", MODE="0666"
+      - path: /etc/udev/rules.d/51-imu.rules
+        permissions: '0644'
+        content: |
+          # KERNEL=="ttyUSB[0-9]*", ATTRS{idProduct}=="6001", ATTRS{serial}=="FT91CQPY", NAME="%k", SYMLINK="ttyUSB_IMU", GROUP="dialout", MODE="0666"
+          # KERNEL=="ttyACM[0-9]*", ATTRS{idProduct}=="5740", NAME="%k", SYMLINK="ttyUSB_IMU", GROUP="dialout", MODE="0666"
+      - path: /etc/udev/rules.d/53-gps.rules
+        permissions: '0644'
+        content: |
+          KERNEL=="ttyACM[0-9]*", ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a9", NAME="%k", SYMLINK="ttyUSB_GPS", GROUP=$
+      - path: /etc/udev/55-dualsense.rules
+        permissions: '0644'
+        content: |
+          KERNEL=="js[0-9]*", SUBSYSTEM=="input", ATTRS{name}=="Wireless Controller", SYMLINK+="input/js_base"
+      - path: /etc/apt/apt.conf.d/10periodic
+        permissions: '0644'
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Download-Upgradeable-Packages "0";
+          APT::Periodic::AutocleanInterval "0";
+      - path: /etc/apt/apt.conf.d/20auto-upgrades
+        permissions: '0644'
+        content: |
+          APT::Periodic::Update-Package-Lists "0";
+          APT::Periodic::Download-Upgradeable-Packages "0";
+          APT::Periodic::AutocleanInterval "0";
+          APT::Periodic::Unattended-Upgrade "0";
+      - path: /etc/gdm3/custom.conf
+        permissions: '0644'
+        content: |
+          # GDM configuration storage
+          #
+          # See /usr/share/gdm/gdm.schemas for a list of available options.
+
+          [daemon]
+          # Uncomment the line below to force the login screen to use Xorg
+          WaylandEnable=false
+
+          # Enabling automatic login
+          AutomaticLoginEnable = true
+          AutomaticLogin = robot
+
+          # Enabling timed login
+          TimedLoginEnable = true
+          TimedLogin = robot
+          TimedLoginDelay = 0
+
+          InitialSetupEnable=false
+
+          [security]
+
+          [xdmcp]
+
+          [chooser]
+
+          [debug]
+          # Uncomment the line below to turn on debugging
+          # More verbose logs
+          # Additionally lets the X server dump core if it crashes
+          #Enable=true
+      - path: /root/screenrc
+        permissions: '0644'
+        content: |
+          termcapinfo xterm* ti@:te@
+          shell -$SHELL
+          setenv LD_LIBRARY_PATH echo $CMAKE_PREFIX_PATH | awk '{split($1, a, ":"); print a[1];}'"/lib":/opt/ros/melodic/lib:/opt/ros/melodic/lib/x86_64-linux-gnu
+          zombie kr
+          verbose on
+      - path: /root/.enable-vnc.sh
+        permissions: '0755'
+        content: |
+          #!/bin/bash
+          dconf write /org/gnome/desktop/remote-access/enabled true
+          dconf write /org/gnome/desktop/remote-access/prompt-enabled false
+          dconf write /org/gnome/desktop/remote-access/authentication-methods "['vnc']"
+          dconf write /org/gnome/desktop/remote-access/view_only false
+          dconf write /org/gnome/desktop/remote-access/require-encryption false
+          dconf write /org/gnome/desktop/remote-access/vnc-password \"\'UjBiMHRuMUs=\'\"
+          eth0_uuid=$(nmcli --get-values connection.uuid c show "netplan-eth0")
+          eth1_uudi=$(nmcli --get-values connection.uuid c show "netplan-eth1")
+          dconf write /org/gnome/settings-daemon/plugins/sharing/vino-server/enabled-connections "['${eth0_uuid}', '${eth1_uudi}']"
+      - path: /root/user-dirs.dirs
+        permissions: '0600'
+        content: |
+          # This file is written by xdg-user-dirs-update
+          # If you want to change or add directories, just edit the line you're
+          # interested in. All local changes will be retained on the next run.
+          # Format is XDG_xxx_DIR="$HOME/yyy", where yyy is a shell-escaped
+          # homedir-relative path, or XDG_xxx_DIR="/yyy", where /yyy is an
+          # absolute path. No other format is supported.
+          #
+          XDG_DESKTOP_DIR="$HOME/desktop"
+          XDG_DOWNLOAD_DIR="$HOME/downloads"
+          XDG_TEMPLATES_DIR="$HOME/templates"
+          XDG_PUBLICSHARE_DIR="$HOME/public"
+          XDG_DOCUMENTS_DIR="$HOME/documents"
+          XDG_MUSIC_DIR="$HOME/music"
+          XDG_PICTURES_DIR="$HOME/pictures"
+          XDG_VIDEOS_DIR="$HOME/videos"
+      - path: /root/gui-config.desktop
+        permissions: '0600'
+        content: |
+          [Desktop Entry]
+          Name=graph-config
+          GenericName=Graphical user configuration
+          Comment=Some description about your script
+          Exec=/home/robot/.local/bin/gui-config
+          Terminal=false
+          Type=Application
+          X-GNOME-Autostart-enabled=true
+      - path: /root/gui-config
+        permissions: '0755'
+        content: |
+          gsettings set org.gnome.desktop.background picture-uri file:///usr/share/backgrounds/robotnik-background.jpg || exit 1
+          gsettings set org.gnome.desktop.interface enable-animations false || exit 1
+          rm /home/robot/.config/autostart/gui-config.desktop || exit 1
+          echo "rm $HOME/.local/bin/gui-config" > $HOME/.local/bin/gui-config || exit 1
+      - path: /etc/systemd/system/fake-hdmi.service
+        permissions: '0644'
+        content: |
+          [Unit]
+          Description=Fake HDMI PLUG
+          After=network-online.target
+          Before=display-manager.service
+
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/local/sbin/hdmi-faker
+
+          [Install]
+          WantedBy=default.target
+      - path: /usr/local/sbin/hdmi-faker
+        permissions: '0755'
+        content: |
+          #!/bin/bash
+          # Description:   HDMI monitor faker
+          # Company:       Robotnik Automation S.L.
+          # Creation Year: 2023
+          # Author:        Guillem Gari <ggari@robotnik.es>
+          #
+          #
+          # Copyright (c) 2023, Robotnik Automation S.L.
+          # All rights reserved.
+          #
+          # Redistribution and use in source and binary forms, with or without
+          # modification, are permitted provided that the following conditions are met:
+          #     * Redistributions of source code must retain the above copyright
+          #       notice, this list of conditions and the following disclaimer.
+          #     * Redistributions in binary form must reproduce the above copyright
+          #       notice, this list of conditions and the following disclaimer in the
+          #       documentation and/or other materials provided with the distribution.
+          #     * Neither the name of the Robotnik Automation S.L.L. nor the
+          #       names of its contributors may be used to endorse or promote products
+          #       derived from this software without specific prior written permission.
+          #
+          # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+          # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+          # THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+          # PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Robotnik Automation S.L.L.
+          # BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+          # OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+          # PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+          # OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+          # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+          # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+          # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+          graphic_card_num="0"
+          display_device="HDMI-A-1"
+          device="/sys/kernel/debug/dri/${graphic_card_num}/${display_device}/force"
+
+          function force_off() {
+              if ! /bin/echo off > "${device}"; then
+                  return 1
+              fi
+              return 0
+          }
+
+          function force_on() {
+              if ! /bin/echo on > "${device}"; then
+                  return 1
+              fi
+              return 0
+          }
+
+          function find_device() {
+              echo "searching $device"
+              for i in $(seq 2 150); do
+                  if test -e "${device}"; then
+                      echo "$device found"
+                      return 0
+                  fi
+                  sleep 2
+              done
+              echo "$device not found"
+              return 1
+          }
+
+          function fake_hdmi() {
+              if ! force_off; then
+                  return 1
+              fi
+              sleep 3
+              if ! force_on; then
+                  return 1
+              fi
+              return 0
+          }
+
+          function main() {
+              if ! find_device; then
+                  return 1
+              fi
+              if ! fake_hdmi; then
+                  return 1
+              fi
+              return 0
+          }
+
+          main ${@}
+          exit $?
+      - path: /root/virtual-monitor
+        permissions: '0755'
+        content: |
+          #!/bin/bash
+          [[ -z $DISPLAY ]] && { echo "no display"; exit 0; }
+          connec=HDMI-1
+          /usr/bin/xrandr -d $DISPLAY --output $connec --primary --auto
+
+          modes=(\
+          "1920 1080 60" \
+          "1920 1000 60" \
+          "1920 980 60" \
+          "1920 900 60" \
+          "1920 800 60" \
+          "1680 1050 60" \
+          "1680 1000 60" \
+          "1680 900 60" \
+          "1680 800 60" \
+          "1600 900 60" \
+          "1440 900 60" \
+          "1280 800 60" \
+          "1152 864 60" \
+          "1280 720 60" \
+          "1024 768 60" \
+          )
+
+          for mode in "${modes[@]}"; do
+            modeline=$(cvt ${mode} | tail -n 1 | cut -d ' ' -f 2-)
+            echo "$modeline"
+            modeline_name=$(echo ${modeline} | cut -d '"' -f 2)
+            eval "/usr/bin/xrandr --newmode ${modeline}"
+            eval "/usr/bin/xrandr --addmode ${connec} ${modeline_name}"
+          done
+          /usr/bin/xrandr
+          /usr/bin/xrandr -s 1920x1080
+      - path: /root/virtual-resize.desktop
+        permissions: '0644'
+        content: |
+          [Desktop Entry]
+          Type=Application
+          Exec=/home/robot/.local/bin/virtual-monitor
+          Hidden=false
+          NoDisplay=false
+          X-GNOME-Autostart-enabled=true
+          Name[en_US]=Virtual-monitor-resizer
+          Name=Virtual-monitor-resizer
+          Comment[en_US]=Virtual monitor resize to 1920x1080
+          Comment=Virtual monitor resize to 1920x1080
+    runcmd:
+      - systemctl stop containerd
+      - mkdir -p /etc/containerd
+      - touch /etc/containerd/config.toml
+      - containerd config default > /etc/containerd/config.toml
+      - >
+        sed -i
+        's/SystemdCgroup = false/SystemdCgroup = true/'
+        /etc/containerd/config.toml
+      - systemctl start containerd
+      - systemctl enable containerd
+      - groupadd docker
+      - usermod -aG docker robot
+      - usermod -aG dialout robot
+      - usermod -aG root robot
+      - >
+        yq -i
+        '.network.renderer="NetworkManager"'
+        /etc/netplan/00-installer-config.yaml
+      - >
+        yq -i
+        '.network.ethernets.eth0 = { "dhcp4": false, "addresses": "[192.168.0.200/24]", "gateway4": "192.168.0.1"}'
+        /etc/netplan/00-installer-config.yaml
+      - sed -i "s#'##g" /etc/netplan/00-installer-config.yaml
+      - >
+        sed -E -i
+        's#quiet splash##;s#(GRUB_CMDLINE_LINUX_DEFAULT=.*) "#\1"#'
+        /etc/default/grub
+      - >
+        sed -E -i
+        's#(GRUB_CMDLINE_LINUX_DEFAULT=)(".*)"#\1\2 quiet splash"#'
+        /etc/default/grub
+      - update-grub
+      - >
+        cd /root/peak-linux-driver-8.16.0 &&
+        make clean &&
+        make NET=NO_NETDEV_SUPPORT &&
+        make install &&
+        rm -rf /root/peak-linux-driver-8.16.0
+      - >
+        cd /opt/RTKLIB/app &&
+        chmod +x makeall.sh &&
+        ./makeall.sh
+      - >
+        cd /root/EIPScanner-1.3.0 &&
+        mkdir build &&
+        cd build &&
+        cmake .. &&
+        cmake --build . --target install &&
+        rm -rf /root/EIPScanner-1.3.0
+      - hostnamectl set-chassis vm
+      - /opt/VirtualGL/bin/vglserver_config +glx +s +f
+      - mv /root/screenrc /home/robot/.screenrc
+      - chown robot:robot /home/robot/.screenrc
+      - >
+        sudo -u robot
+        bash -c '
+        python3 -m pip install --upgrade pip &&
+        python3 -m pip install pyjwt &&
+        python3 -m pip install httplib2 &&
+        python3 -m pip install requests &&
+        python3 -m pip install http.client
+        '
+      - python3 -m pip install six==1.13.0
+      - python3 -m pip install evdev==0.8.1
+      - python3 -m pip install ds4drv
+      - mv /root/fzf /home/robot/.fzf
+      - chown robot:robot -R /home/robot/.fzf
+      - sudo -u robot /home/robot/.fzf/install --all
+      - sudo -u robot mkdir -p /home/robot/.config
+      - mv /root/user-dirs.dirs /home/robot/.config/user-dirs.dirs
+      - chown robot:robot /home/robot/.config/user-dirs.dirs
+      - sudo -u robot mkdir -p /home/robot/desktop
+      - sudo -u robot mkdir -p /home/robot/downloads
+      - sudo -u robot mkdir -p /home/robot/templates
+      - sudo -u robot mkdir -p /home/robot/public
+      - sudo -u robot mkdir -p /home/robot/documents
+      - sudo -u robot mkdir -p /home/robot/music
+      - sudo -u robot mkdir -p /home/robot/pictures
+      - sudo -u robot mkdir -p /home/robot/videos
+      - sudo -u robot mkdir -p /home/robot/.config/autostart
+      - sudo -u robot mkdir -p /home/robot/.local/bin
+      - mv /root/gui-config.desktop /home/robot/.config/autostart/gui-config.desktop
+      - chown robot:robot /home/robot/.config/autostart/gui-config.desktop
+      - mv /root/gui-config /home/robot/.local/bin/gui-config
+      - chown robot:robot /home/robot/.local/bin/gui-config
+      - mv /root/virtual-monitor /home/robot/.local/bin/virtual-monitor
+      - chown robot:robot /home/robot/.local/bin/virtual-monitor
+      - mv /root/virtual-resize.desktop home/robot/.config/autostart/virtual-resize.desktop
+      - chown robot:robot home/robot/.config/autostart/virtual-resize.desktop
+      - systemctl enable fake-hdmi.service
+      - >
+        sudo -u robot
+        echo
+        'export ROS_MASTER_URI="http://$(hostname):11311"'
+        >>/home/robot/.bashrc
+      - >
+        sudo -u robot
+        echo
+        "source /opt/ros/noetic/setup.bash"
+        >>/home/robot/.bashrc
+      - >
+        sudo -u robot
+        echo
+        "source /usr/share/powerline/bindings/bash/powerline.sh"
+        >>/home/robot/.bashrc
+      - snap stop --disable canonical-livepatch
+      - netplan apply
+      - mv /root/.enable-vnc.sh /home/robot/.local/bin/vnc-enable
+      - chown robot:robot /home/robot/.local/bin/vnc-enable
+      # - >
+      #   sudo -u robot
+      #   /home/robot/.local/bin/vnc-enable
+      - >
+        sudo -u robot
+        echo "yes" >> /home/robot/.config/gnome-initial-setup-done
+      - systemctl set-default graphical
+      - reboot

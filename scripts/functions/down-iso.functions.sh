@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description:   download ubuntu server iso
+# Description:   General functions
 # Company:       Robotnik Automation S.L.
 # Creation Year: 2023
 # Author:        Guillem Gari <ggari@robotnik.es>
@@ -31,85 +31,92 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-data_dir="data"
-data_files=(\
-  general.data.sh \
-  strings.data.sh \
-  commands.data.sh \
-  down-iso.data.sh \
-	../iso-params \
-
-)
-
-data_files_fp=(\
-)
-
-func_dir="functions"
-func_files=(\
-  general.functions.sh \
-  down-iso.functions.sh \
-)
-
-func_files_fp=(\
-)
-
-function test_file() {
-	local file="${1}"
-	if ! test -r "${file}"; then
-		echo "File not present: ${file} : Aborting" 2>&1
+function download_shasum() {
+	print_info "${nfo_str_shasum_download}"
+	eval "shasum_url=${shasum_url}"
+	if ! eval "${shasum_download_command}"; then
+		print_error "${err_str_shasum_download}"
 		return 1
 	fi
+	print_success "${suc_str_shasum_download}"
 	return 0
 }
 
-function prepare_files() {
-  previous_exec_path="$PWD"
-  host_source_path="$(dirname "$(readlink -f "${0}")")"
-  for data_file in "${data_files[@]}"; do
-    data_file="${host_source_path}/${data_dir}/${data_file}"
-    if ! test_file "${data_file}"; then
-      return 1
-    fi
-    data_files_fp=(\
-      "${data_files_fp[@]}" \
-      "${data_file}" \
-    )
-  done
+function get_iso_name() {
+  print_info "${nfo_str_get_iso_name}"
+  eval "get_iso_name_command=\"${get_iso_name_command}\""
+  if ! iso_name=$(eval "${get_iso_name_command}"); then
+    print_error "${err_str_get_iso_name}"
+    return 1
+  fi
+  eval iso_name_full="${iso_name_full}"
+  print_success "${suc_str_get_iso_name}"
+	return 0
+}
 
-  for func_file in "${func_files[@]}"; do
-    func_file="${host_source_path}/${func_dir}/${func_file}"
-    if ! test_file "${func_file}"; then
-      return 1
-    fi
-    func_files_fp=(\
-      "${func_files_fp[@]}" \
-      "${func_file}" \
-    )
-  done
-  cd "$host_source_path"
+function is_iso_already_downloaded() {
+  print_info "${nfo_str_ck_local_iso}"
+  if ! [[ -r "${iso_name}" ]]; then
+    print_info "${err_str_ck_local_iso}"
+    return 1
+  fi
+  print_success "${suc_str_ck_local_iso}"
+  if ! verify_iso; then
+    return 1
+  fi
+  iso_verifed=0
   return 0
 }
 
-if ! prepare_files; then
-	cd "${previous_exec_path}"
-	exit 1
-fi
-
-for data_file in "${data_files_fp[@]}"; do
-	if ! source "${data_file}"; then
-		echo "Could not load: ${data_file} : Aborting" 2>&1
-		exit 1
-	fi
-done
-
-for func_file in "${func_files_fp[@]}"; do
-  if ! source "${func_file}"; then
-    echo "Could not load: ${func_file} : Aborting" 2>&1
-    exit 1
+function download_iso() {
+  if is_iso_already_downloaded; then
+    return 0
   fi
-done
+  print_info "${nfo_str_dl_iso}"
+  if ! eval "${download_iso_command}"; then
+    print_error "${err_str_dl_iso}"
+    return 1
+  fi
+  print_success "${suc_str_dl_iso}"
+	return 0
+}
 
-cd "${previous_exec_path}"
+function verify_iso() {
+  if [[ "${iso_verifed}" -eq 0 ]]; then
+    return 0
+  fi
+	print_info "${nfo_str_ver_iso}"
+  if ! eval "${verify_iso_command}"; then
+    print_error "${err_str_ver_iso}"
+    return 1
+  fi
+  print_success "${suc_str_ver_iso}"
+  return 0
+}
 
-main_download_iso "${@}"
-exit $?
+function get_iso() {
+  if ! download_shasum; then
+    return 1
+  fi
+  if ! get_iso_name; then
+    return 1
+  fi
+  if ! download_iso; then
+    return 1
+  fi
+  if ! verify_iso; then
+    return 1
+  fi
+
+  return 0
+}
+
+function main_download_iso() {
+  if ! tools_check "${down_iso_tool_list[@]}"; then
+    return 1
+  fi
+  if ! get_iso; then
+    return 0
+  fi
+  return 0
+}

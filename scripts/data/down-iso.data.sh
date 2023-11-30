@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description:   download ubuntu server iso
+# Description:   download iso data
 # Company:       Robotnik Automation S.L.
 # Creation Year: 2023
 # Author:        Guillem Gari <ggari@robotnik.es>
@@ -30,86 +30,17 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-data_dir="data"
-data_files=(\
-  general.data.sh \
-  strings.data.sh \
-  commands.data.sh \
-  down-iso.data.sh \
-	../iso-params \
-
+down_iso_tool_list=(\
+  grep \
+  wget \
+  awk \
+  sha256sum \
+  sed \
 )
 
-data_files_fp=(\
-)
+# 0 -> iso verified
+# 1 -> iso not verified
+iso_verifed=1
 
-func_dir="functions"
-func_files=(\
-  general.functions.sh \
-  down-iso.functions.sh \
-)
-
-func_files_fp=(\
-)
-
-function test_file() {
-	local file="${1}"
-	if ! test -r "${file}"; then
-		echo "File not present: ${file} : Aborting" 2>&1
-		return 1
-	fi
-	return 0
-}
-
-function prepare_files() {
-  previous_exec_path="$PWD"
-  host_source_path="$(dirname "$(readlink -f "${0}")")"
-  for data_file in "${data_files[@]}"; do
-    data_file="${host_source_path}/${data_dir}/${data_file}"
-    if ! test_file "${data_file}"; then
-      return 1
-    fi
-    data_files_fp=(\
-      "${data_files_fp[@]}" \
-      "${data_file}" \
-    )
-  done
-
-  for func_file in "${func_files[@]}"; do
-    func_file="${host_source_path}/${func_dir}/${func_file}"
-    if ! test_file "${func_file}"; then
-      return 1
-    fi
-    func_files_fp=(\
-      "${func_files_fp[@]}" \
-      "${func_file}" \
-    )
-  done
-  cd "$host_source_path"
-  return 0
-}
-
-if ! prepare_files; then
-	cd "${previous_exec_path}"
-	exit 1
-fi
-
-for data_file in "${data_files_fp[@]}"; do
-	if ! source "${data_file}"; then
-		echo "Could not load: ${data_file} : Aborting" 2>&1
-		exit 1
-	fi
-done
-
-for func_file in "${func_files_fp[@]}"; do
-  if ! source "${func_file}"; then
-    echo "Could not load: ${func_file} : Aborting" 2>&1
-    exit 1
-  fi
-done
-
-cd "${previous_exec_path}"
-
-main_download_iso "${@}"
-exit $?
+shasum_url='${iso_base_url}/${ubuntu_distro}/${shasum_file}'
+iso_name_full='${iso_base_url}/${ubuntu_distro}/${iso_name}'
