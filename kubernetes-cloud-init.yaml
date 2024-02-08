@@ -69,10 +69,11 @@ autoinstall:
     - docker-ce
     - docker-ce-cli
     - docker-compose-plugin
-    # kube tools package order matters (version specific)
     - kubelet
     - kubectl
     - kubeadm
+    - aria2c
+    - nala
   late-commands:
     - sed -i 's#^/swap.img#\#/swap.img#' /target/etc/fstab
     - >
@@ -146,6 +147,15 @@ autoinstall:
     - wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O yq
     - chmod +x yq
     - mv yq /target/usr/local/bin/yq
+    - >
+      wget
+      https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast
+      -O /target/usr/local/sbin/apt-fast
+    - chmod +x /target/usr/local/sbin/apt-fast
+    - >
+      wget
+      https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast.conf
+      -O /target/etc/apt-fast.conf
   user-data:
     write_files:
       - path: /etc/modules-load.d/k8s.conf
