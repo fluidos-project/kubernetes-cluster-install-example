@@ -169,7 +169,7 @@ autoinstall:
           net.bridge.bridge-nf-call-iptables  = 1
           net.bridge.bridge-nf-call-ip6tables = 1
           net.ipv4.ip_forward                 = 1
-      - path: /usr/local/bin/update_k9s
+      - path: /usr/local/sbin/update_k9s
         permissions: '0755'
         content: |
           #!/bin/bash
@@ -383,7 +383,7 @@ autoinstall:
 
           main "${@}"
           exit $?
-      - path: /usr/local/bin/update_liqoctl
+      - path: /usr/local/sbin/update_liqoctl
         permissions: '0755'
         content: |
           #!/bin/bash
@@ -598,7 +598,6 @@ autoinstall:
 
           main "${@}"
           exit $?
-
       - path: /root/environment
         permissions: '0644'
         content: |
