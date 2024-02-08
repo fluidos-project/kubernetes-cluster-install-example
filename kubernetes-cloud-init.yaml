@@ -72,7 +72,7 @@ autoinstall:
     - kubelet
     - kubectl
     - kubeadm
-    - aria2c
+    - aria2
     - nala
   late-commands:
     - sed -i 's#^/swap.img#\#/swap.img#' /target/etc/fstab
