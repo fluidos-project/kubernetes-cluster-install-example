@@ -387,6 +387,7 @@ autoinstall:
           export CALICO_VERSION=3.25.1
           export FLANNEL_VERSION=0.22.3
           export WEAVE_VERSION=2.8.1
+          export CERT_MAN_VERSION=1.13.2
           export METALLB_IP_POD="192.168.2.211-192.168.2.219"
           export CLUSTER_NAME=rob-cluster-00
       - path: /root/destroy-cluster.sh
@@ -516,8 +517,13 @@ autoinstall:
           kubectl apply -f kube-proxy-ds.yaml
           rm kube-proxy-ds.yaml
           helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/ || exit 1
-          helm install --set 'args={--kubelet-insecure-tls}' --namespace kube-system metrics metrics-server/metrics-server || exit 1
+          helm repo add jetstack https://charts.jetstack.io || exit 1
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo add metallb https://metallb.github.io/metallb || exit 1
+          helm repo update || exit 1
+          helm install --set 'args={--kubelet-insecure-tls}' --namespace kube-system metrics metrics-server/metrics-server || exit 1
+          helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v${CERT_MAN_VERSION} --set installCRDs=true || exit 1
+          helm install --create-namespace --namespace prometheus prometheus prometheus-community/kube-prometheus-stack || exit 1
           helm install --create-namespace --namespace metallb-system metallb metallb/metallb || exit 1
 
 
@@ -576,7 +582,6 @@ autoinstall:
           )
           sudo ufw allow ${LIQO_SVC_PORT}/${LIQO_SVC_PROTO} || exit 1
           liqoctl generate peer-command
-
     runcmd:
       - systemctl stop containerd
       - mkdir -p /etc/containerd
